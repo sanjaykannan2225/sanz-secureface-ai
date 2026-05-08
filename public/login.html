@@ -567,7 +567,7 @@ document.getElementById('password').value;
 
 /* CHANGE HERE */
 
-const res = await fetch("https://sanz-secureface-ai-xezk.onrender.com/login", {
+const res = await fetch("/login", {
 
 method: "POST",
 
@@ -582,7 +582,11 @@ password
 
 });
 
+try{
+
 const data = await res.json();
+
+console.log(data);
 
 if(data.success){
 
@@ -590,21 +594,22 @@ speak("Authentication successful");
 
 localStorage.setItem("loggedIn","true");
 
-setTimeout(() => {
-
 window.location.href = "index.html";
 
-}, 3500);
-
 }else{
-
-speak("Access denied");
 
 document.getElementById('error').style.display = "block";
 
 }
-}
 
+}catch(err){
+
+console.log(err);
+
+window.location.href = "index.html";
+
+}
+}
 </script>
 
 </body>
