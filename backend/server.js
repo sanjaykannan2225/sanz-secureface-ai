@@ -1,12 +1,16 @@
 const express = require('express');
+require('dotenv').config();
 const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require("mongoose");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -16,12 +20,26 @@ app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // Ensure data files and folders exist
 const UPLOADS_DIR = path.join(__dirname, '../public/uploads');
-const USERS_FILE = path.join(__dirname, 'users.json');
-const ATTENDANCE_FILE = path.join(__dirname, 'attendance.json');
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  image: String,
+  registeredAt: String
+});
+
+const User = mongoose.model("User", userSchema);
+
+const attendanceSchema = new mongoose.Schema({
+  name: String,
+  date: String,
+  time: String,
+  matchType: String,
+  timestamp: String
+});
+
+const Attendance = mongoose.model("Attendance", attendanceSchema);
 
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-if (!fs.existsSync(USERS_FILE)) fs.writeFileSync(USERS_FILE, JSON.stringify([]));
-if (!fs.existsSync(ATTENDANCE_FILE)) fs.writeFileSync(ATTENDANCE_FILE, JSON.stringify([]));
 
 // Multer config
 const storage = multer.diskStorage({
@@ -54,17 +72,14 @@ const upload = multer({
 });
 
 // Helper functions
-const readUsers = () => JSON.parse(fs.readFileSync(USERS_FILE));
-const writeUsers = (data) => fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2));
-const readAttendance = () => JSON.parse(fs.readFileSync(ATTENDANCE_FILE));
-const writeAttendance = (data) => fs.writeFileSync(ATTENDANCE_FILE, JSON.stringify(data, null, 2));
+
 
 // ─── ROUTES ───────────────────────────────────────────────
 
 // Register user
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
 
-upload.single('image')(req, res, function(err) {
+upload.single('image')(req, res, async function(err) {
 
 if (err) {
 
@@ -86,9 +101,7 @@ error: 'Name and image required'
 });
 
 }
-const users = readUsers().filter(
-u => u && u.id && u.name && u.image
-);
+const users = await User.find();
 const existing = users.find(
 u => u.name.toLowerCase() === name.toLowerCase()
 );
@@ -115,15 +128,19 @@ timeZone: 'Asia/Kolkata'
 
 };
 
-users.push(newUser);
-
-writeUsers(users);
+await User.create({
+  name: name.trim(),
+  image: `/uploads/${req.file.filename}`,
+  registeredAt: new Date().toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata'
+  })
+});
+console.log("User saved to MongoDB");
 
 res.json({
-success: true,
-user: newUser
+  success: true,
+  user: newUser
 });
-
 } catch (e) {
 
 console.error(e);
@@ -139,20 +156,11 @@ error: 'Registration failed'
 });
 
 // Delete user
-app.get('/api/users', (req, res) => {
+app.get('/api/users', async (req, res) => {
 
 try {
 
-const users = readUsers().filter(
-u =>
-u &&
-u.id &&
-u.name &&
-u.image &&
-u.image !== '/undefined'
-);
-
-writeUsers(users);
+const users = await User.find();
 
 res.json(users);
 
@@ -167,108 +175,122 @@ error: 'Failed to fetch users'
 }
 
 });
+app.delete('/api/users/:id', async (req, res) => {
 
-// Delete user
-app.delete('/api/users/:id', (req, res) => {
-
-try {
-
-let users = readUsers();
-
-const user = users.find(
-u => u.id === req.params.id
-);
-
-if (!user) {
-
-return res.status(404).json({
-error: 'User not found'
-});
-
-}
-
-const imgPath = path.join(
-__dirname,
-'../public',
-user.image
-);
-
-if (fs.existsSync(imgPath)) {
-fs.unlinkSync(imgPath);
-}
-
-users = users.filter(
-u => u.id !== req.params.id
-);
-
-writeUsers(users);
-
-res.json({
-success: true
-});
-
-} catch (err) {
-
-console.error(err);
-
-res.status(500).json({
-error: 'Delete failed'
-});
-
-}
-
-});
-
-// Mark attendance
-
-// Mark attendance
-app.post('/api/attendance', (req, res) => {
   try {
-    const { name, matchType } = req.body;
-    if (!name) return res.status(400).json({ error: 'Name required' });
 
-    const attendance = readAttendance();
-const now = new Date();
+    const user = await User.findById(req.params.id);
 
-const today = now.toLocaleDateString('en-CA', {
-  timeZone: 'Asia/Kolkata'
-});
+    if (!user) {
 
-const time = now.toLocaleTimeString('en-IN', {
-  timeZone: 'Asia/Kolkata',
-  hour12: false
-});
+      return res.status(404).json({
+        error: 'User not found'
+      });
 
-    // Check if already marked today
-    const alreadyMarked = attendance.find(a => a.name === name && a.date === today);
-    if (alreadyMarked) {
-      return res.json({ success: false, message: 'Already marked today', duplicate: true });
     }
 
-    const record = {
-      id: Date.now().toString(),
+    // delete image
+    const imgPath = path.join(
+      __dirname,
+      '../public',
+      user.image
+    );
+
+    if (fs.existsSync(imgPath)) {
+      fs.unlinkSync(imgPath);
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Delete failed'
+    });
+
+  }
+
+});
+
+// Mark attendance
+// Mark attendance
+app.post('/api/attendance', async (req, res) => {
+
+  try {
+
+    const { name, matchType } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        error: 'Name required'
+      });
+    }
+
+    const now = new Date();
+
+    const today = now.toLocaleDateString('en-CA', {
+      timeZone: 'Asia/Kolkata'
+    });
+
+    const time = now.toLocaleTimeString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      hour12: false
+    });
+
+    const alreadyMarked = await Attendance.findOne({
+      name,
+      date: today
+    });
+
+    if (alreadyMarked) {
+
+      return res.json({
+        success: false,
+        message: 'Already marked today',
+        duplicate: true
+      });
+
+    }
+
+    const record = await Attendance.create({
+
       name,
       date: today,
       time,
       matchType: matchType || 'Exact Match',
       timestamp: now.toISOString()
-    };
 
-    attendance.push(record);
-    writeAttendance(attendance);
+    });
 
     console.log(`📋 Attendance: ${name} at ${time}`);
-    res.json({ success: true, record });
+
+    res.json({
+      success: true,
+      record
+    });
+
   } catch (err) {
+
     console.error('Attendance error:', err);
-    res.status(500).json({ error: 'Attendance marking failed' });
+
+    res.status(500).json({
+      error: 'Attendance marking failed'
+    });
+
   }
+
 });
 
 // Get attendance
-app.get('/api/attendance', (req, res) => {
-  try {
-    const attendance = readAttendance();
+app.get('/api/attendance', async (req, res) => {
+    try {
+const attendance = await Attendance.find();
     const { date, name } = req.query;
 
     let filtered = attendance;
@@ -282,22 +304,33 @@ app.get('/api/attendance', (req, res) => {
 });
 
 // Clear attendance
-app.delete('/api/attendance/clear', (req, res) => {
+app.delete('/api/attendance/clear', async (req, res) => {
+
   try {
-    writeAttendance([]);
-    res.json({ success: true });
+
+    await Attendance.deleteMany({});
+
+    res.json({
+      success: true
+    });
+
   } catch (err) {
-    res.status(500).json({ error: 'Failed to clear attendance' });
+
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Failed to clear attendance'
+    });
+
   }
+
 });
 
 // Dashboard stats
-app.get('/api/dashboard', (req, res) => {
+app.get('/api/dashboard', async (req, res) => {
   try {
-   const users = readUsers().filter(
-u => u && u.id && u.name && u.image
-);
-    const attendance = readAttendance();
+const users = await User.find();
+const attendance = await Attendance.find();
     const today = new Date().toLocaleDateString('en-CA', {
   timeZone: 'Asia/Kolkata'
 });
@@ -328,9 +361,9 @@ u => u && u.id && u.name && u.image
 });
 
 // Export attendance as CSV
-app.get('/api/export', (req, res) => {
+app.get('/api/export', async (req, res) => {
   try {
-    const attendance = readAttendance();
+const attendance = await Attendance.find();
     let csv = 'Name,Date,Time,Match Type\n';
     attendance.forEach(a => {
       csv += `"${a.name}","${a.date}","${a.time}","${a.matchType}"\n`;
