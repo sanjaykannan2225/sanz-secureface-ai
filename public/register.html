@@ -548,7 +548,10 @@ await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
       const img = await faceapi.bufferToImage(imageFile);
 
 const detection = await faceapi
-  .detectSingleFace(img)
+  .detectSingleFace(
+    img,
+    new faceapi.TinyFaceDetectorOptions()
+  )
   .withFaceLandmarks()
   .withFaceDescriptor();
 
@@ -606,15 +609,16 @@ formData.append(
       }
     }
 
-    function closeSuccess() {
-      document.getElementById('successPopup').classList.remove('show');
-      document.getElementById('registerForm').reset();
-      document.getElementById('previewWrap').classList.remove('visible');
-      document.getElementById('uploadZone').style.display = '';
-      document.getElementById('progressWrap').style.display = 'none';
-      document.getElementById('submitBtn').disabled = false;
-      document.getElementById('submitBtn').textContent = '🆔 REGISTER FACE';
-    }
+function closeSuccess() {
+  document.getElementById('successPopup').classList.remove('show');
+  document.getElementById('registerForm').reset();
+  document.getElementById('previewWrap').classList.remove('visible');
+  document.getElementById('previewImg').src = '';
+  document.getElementById('uploadZone').style.display = '';
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = '🆔 REGISTER FACE';
+}
 
     async function loadRegisteredUsers() {
       try {
