@@ -6,6 +6,14 @@ const path = require('path');
 const fs = require('fs');
 const mongoose = require("mongoose");
 
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 const app = express();
 const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGO_URI)
@@ -43,13 +51,15 @@ const Attendance = mongoose.model("Attendance", attendanceSchema);
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 // Multer config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, UPLOADS_DIR),
-  filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, unique + path.extname(file.originalname));
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'uploads',
+    allowed_formats: ['jpg', 'png', 'jpeg']
   }
 });
+
 const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -117,7 +127,7 @@ error: 'User already registered'
 
 const savedUser = await User.create({
   name: name.trim(),
-  image: `/uploads/${req.file.filename}`,
+image: req.file.path,
   descriptors: [JSON.parse(descriptor)],
   registeredAt: new Date().toLocaleString('en-IN', {
     timeZone: 'Asia/Kolkata'
