@@ -24,6 +24,7 @@ const UPLOADS_DIR = path.join(__dirname, '../public/uploads');
 const userSchema = new mongoose.Schema({
   name: String,
   image: String,
+  descriptors: [[Number]],
   registeredAt: String
 });
 
@@ -92,7 +93,7 @@ error: err.message || 'Image upload failed'
 
 try {
 
-const { name } = req.body;
+const { name, descriptor } = req.body;
 
 if (!name || !req.file) {
 
@@ -117,6 +118,7 @@ error: 'User already registered'
 const savedUser = await User.create({
   name: name.trim(),
   image: `/uploads/${req.file.filename}`,
+  descriptors: [JSON.parse(descriptor)],
   registeredAt: new Date().toLocaleString('en-IN', {
     timeZone: 'Asia/Kolkata'
   })

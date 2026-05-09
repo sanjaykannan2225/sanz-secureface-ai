@@ -541,11 +541,19 @@ SANZ <span>SECUREFACE</span> AI
         prog = Math.min(prog + Math.random() * 15, 85);
         pb.style.width = prog + '%';
       }, 200);
+      
+const descriptor = [0.1, 0.2, 0.3];
 
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('image', imageFile);
+const formData = new FormData();
 
+formData.append('name', name);
+
+formData.append('image', imageFile);
+
+formData.append(
+  'descriptor',
+  JSON.stringify(descriptor)
+);
       try {
         const res = await fetch('/api/register', { method: 'POST', body: formData });
         const data = await res.json();
