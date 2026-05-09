@@ -114,33 +114,21 @@ error: 'User already registered'
 
 }
 
-const newUser = {
-
-id: Date.now().toString(),
-
-name: name.trim(),
-
-image: `/uploads/${req.file.filename}`,
-
-registeredAt: new Date().toLocaleString('en-IN', {
-timeZone: 'Asia/Kolkata'
-})
-
-};
-
-await User.create({
+const savedUser = await User.create({
   name: name.trim(),
   image: `/uploads/${req.file.filename}`,
   registeredAt: new Date().toLocaleString('en-IN', {
     timeZone: 'Asia/Kolkata'
   })
 });
+
 console.log("User saved to MongoDB");
 
 res.json({
   success: true,
-  user: newUser
+  user: savedUser
 });
+
 } catch (e) {
 
 console.error(e);

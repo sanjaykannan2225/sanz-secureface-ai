@@ -864,8 +864,7 @@ allAttendance = await res.json();
 
         gallery.innerHTML = users.map(u => `
           <div class="user-card glass-card">
-            <img class="user-card-photo" src="${u.image}" alt="${u.name}" 
-              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 70 70%22><circle cx=%2235%22 cy=%2235%22 r=%2235%22 fill=%22%23051020%22/><text x=%2235%22 y=%2245%22 text-anchor=%22middle%22 fill=%22%2300d4ff%22 font-size=%2232%22>👤</text></svg>'" />
+<img class="user-card-photo" src="${u.image}" loading="lazy" alt="${u.name}"              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 70 70%22><circle cx=%2235%22 cy=%2235%22 r=%2235%22 fill=%22%23051020%22/><text x=%2235%22 y=%2245%22 text-anchor=%22middle%22 fill=%22%2300d4ff%22 font-size=%2232%22>👤</text></svg>'" />
             <div class="user-card-name">${u.name}</div>
            <div class="user-card-date">
 ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'No Date'}
@@ -927,8 +926,6 @@ async function clearAttendance() {
     const data = await response.json();
 
     if (data.success) {
-      attendanceData = [];
-      renderAttendance();
       showToast('Attendance cleared', 'success');
     } else {
       showToast('Failed to clear attendance', 'error');
