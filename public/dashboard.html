@@ -870,8 +870,10 @@ allAttendance = await res.json();
            <div class="user-card-date">
 ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'No Date'}
 </div>
-            <button class="user-card-del" onclick="deleteUser('${u.id}', '${u.name}')">🗑 DELETE</button>
-          </div>
+<button class="user-card-del" onclick="deleteUser('${u._id}', '${u.name}')">
+🗑 DELETE
+</button>
+            </div>
         `).join('');
       } catch (e) {
         showToast('Failed to load users', 'error');
@@ -881,7 +883,9 @@ ${u.registeredAt ? new Date(u.registeredAt).toLocaleDateString() : 'No Date'}
     async function deleteUser(id, name) {
       if (!confirm(`Delete ${name}? This cannot be undone.`)) return;
       try {
-       const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+const res = await fetch(`/api/users/${id}`, {
+  method: 'DELETE'
+});
         const data = await res.json();
         if (data.success) {
           showToast(`Deleted: ${name}`, 'success');
