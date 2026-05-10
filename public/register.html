@@ -450,6 +450,33 @@ SANZ <span>SECUREFACE</span> AI
                 <div class="upload-icon">📷</div>
                 <div class="upload-text">CLICK OR DRAG IMAGE</div>
                 <div class="upload-sub">JPG, PNG, WEBP up to 10MB</div>
+
+                <button type="button"
+class="btn btn-secondary w-full"
+onclick="openCamera()"
+style="margin-top:12px;justify-content:center;">
+
+📸 TAKE PHOTO
+
+</button>
+
+<video id="camera"
+autoplay
+playsinline
+style="width:100%;margin-top:15px;border-radius:12px;display:none;">
+</video>
+
+<canvas id="snapshotCanvas" style="display:none;"></canvas>
+
+<button type="button"
+id="captureBtn"
+class="btn btn-primary w-full"
+onclick="capturePhoto()"
+style="margin-top:10px;display:none;justify-content:center;">
+
+✅ CAPTURE PHOTO
+
+</button>
               </div>
 
               <!-- Preview -->
@@ -504,6 +531,78 @@ SANZ <span>SECUREFACE</span> AI
       };
       reader.readAsDataURL(file);
     }
+
+    let capturedFile = null;
+
+async function openCamera() {
+
+const video = document.getElementById('camera');
+
+const captureBtn = document.getElementById('captureBtn');
+
+try {
+
+const stream = await navigator.mediaDevices.getUserMedia({
+video: true
+});
+
+video.srcObject = stream;
+
+video.style.display = 'block';
+
+captureBtn.style.display = 'flex';
+
+} catch (err) {
+
+showToast('Camera access denied', 'error');
+
+}
+
+}
+
+async function capturePhoto() {
+
+const video = document.getElementById('camera');
+
+const canvas = document.getElementById('snapshotCanvas');
+
+const ctx = canvas.getContext('2d');
+
+canvas.width = video.videoWidth;
+
+canvas.height = video.videoHeight;
+
+ctx.drawImage(video, 0, 0);
+
+canvas.toBlob(blob => {
+
+const file = new File([blob], 'capture.jpg', {
+type: 'image/jpeg'
+});
+
+capturedFile = file;
+
+const dt = new DataTransfer();
+
+dt.items.add(file);
+
+const input = document.getElementById('imageInput');
+
+input.files = dt.files;
+
+previewImage({ target: input });
+
+showToast('Photo captured successfully', 'success');
+
+}, 'image/jpeg');
+
+video.srcObject.getTracks().forEach(track => track.stop());
+
+video.style.display = 'none';
+
+document.getElementById('captureBtn').style.display = 'none';
+
+}
 
     function dragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('dragover'); }
     function dragLeave() { document.getElementById('uploadZone').classList.remove('dragover'); }
