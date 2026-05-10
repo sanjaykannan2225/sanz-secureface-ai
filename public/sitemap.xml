@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
@@ -7,19 +6,35 @@
 </url>
 
 <url>
-<loc>https://sanz-secureface-ai-xezk.onrender.com/login.html</loc>
+<loc>https://sanz-secureface-ai-1.onrender.com/index.html</loc>
 </url>
 
 <url>
-<loc>https://sanz-secureface-ai-xezk.onrender.com/dashboard.html</loc>
+<loc>https://sanz-secureface-ai-1.onrender.com/login.html</loc>
 </url>
 
 <url>
-<loc>https://sanz-secureface-ai-xezk.onrender.com/register.html</loc>
+<loc>https://sanz-secureface-ai-1.onrender.com/register.html</loc>
 </url>
 
 <url>
-<loc>https://sanz-secureface-ai-xezk.onrender.com/about.html</loc>
+<loc>https://sanz-secureface-ai-1.onrender.com/dashboard.html</loc>
+</url>
+
+<url>
+<loc>https://sanz-secureface-ai-1.onrender.com/about.html</loc>
+</url>
+
+<url>
+<loc>https://sanz-secureface-ai-1.onrender.com/features.html</loc>
+</url>
+
+<url>
+<loc>https://sanz-secureface-ai-1.onrender.com/user-guide.html</loc>
+</url>
+
+<url>
+<loc>https://sanz-secureface-ai-1.onrender.com/scan.html</loc>
 </url>
 
 </urlset>
