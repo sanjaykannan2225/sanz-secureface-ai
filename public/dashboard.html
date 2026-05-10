@@ -974,8 +974,6 @@ doc.addImage(
 // MAIN TITLE
 doc.setFont("helvetica","bold");
 doc.setFontSize(26);
-
-// DARK BLUE COLOR
 doc.setTextColor(0,35,102);
 
 doc.text(
@@ -1020,8 +1018,6 @@ doc.text(
 // SECTION TITLE
 doc.setFont("helvetica","bold");
 doc.setFontSize(18);
-
-// DARK BLUE
 doc.setTextColor(0,35,102);
 
 doc.text(
@@ -1040,6 +1036,66 @@ doc.line(
 79
 );
 
+// TABLE HEADER
+let y = 95;
+
+doc.setFont("helvetica","bold");
+doc.setFontSize(12);
+doc.setTextColor(255,255,255);
+
+// HEADER BACKGROUND
+doc.setFillColor(0,35,102);
+
+doc.rect(
+15,
+y - 6,
+180,
+10,
+"F"
+);
+
+doc.text("No",20,y);
+doc.text("Name",40,y);
+doc.text("Date",95,y);
+doc.text("Time",145,y);
+
+y += 12;
+
+// TABLE DATA
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+doc.setTextColor(40);
+
+allAttendance.forEach((r,i)=>{
+
+doc.text(
+String(i + 1),
+20,
+y
+);
+
+doc.text(
+String(r.name || ""),
+40,
+y
+);
+
+doc.text(
+String(r.date || ""),
+95,
+y
+);
+
+doc.text(
+String(r.time || ""),
+145,
+y
+);
+
+y += 10;
+
+});
+
 // FOOTER
 doc.setFont("times","italic");
 doc.setFontSize(11);
@@ -1052,9 +1108,14 @@ pageHeight - 15
 );
 
 // SAVE
-doc.save("SANZ_Attendance_Report.pdf");
+doc.save(
+"SANZ_Attendance_Report.pdf"
+);
 
 }
+
+
+
 function downloadExcel(){
 
 const data = [
