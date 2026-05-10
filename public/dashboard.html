@@ -954,52 +954,254 @@ const { jsPDF } = window.jspdf;
 
 const doc = new jsPDF();
 
-doc.setFontSize(20);
-doc.text("SANZ SECUREFACE AI", 20, 20);
+const pageWidth = doc.internal.pageSize.width;
+const pageHeight = doc.internal.pageSize.height;
 
-doc.setFontSize(12);
-doc.text("Attendance Report", 20, 40);
+// BACKGROUND
+doc.setFillColor(245,248,255);
+doc.rect(0,0,pageWidth,pageHeight,"F");
+
+// LOGO
+doc.addImage(
+"uploads/logo3.png",
+"PNG",
+15,
+10,
+22,
+22
+);
+
+// MAIN TITLE
+doc.setFont("helvetica","bold");
+doc.setFontSize(26);
+
+// DARK BLUE COLOR
+doc.setTextColor(0,35,102);
+
+doc.text(
+"SANZ SECUREFACE AI",
+45,
+24
+);
+
+// SUBTITLE
+doc.setFont("times","italic");
+doc.setFontSize(13);
+doc.setTextColor(90);
+
+doc.text(
+"AI Attendance Report",
+45,
+33
+);
+
+// BLUE LINE
+doc.setDrawColor(0,35,102);
+doc.setLineWidth(0.7);
+
+doc.line(
+15,
+42,
+pageWidth - 15,
+42
+);
+
+// DATE
+doc.setFont("helvetica","normal");
+doc.setFontSize(11);
+doc.setTextColor(70);
 
 doc.text(
 "Generated: " + new Date().toLocaleString(),
-20,
+15,
 55
 );
 
-doc.save("attendance-report.pdf");
+// SECTION TITLE
+doc.setFont("helvetica","bold");
+doc.setFontSize(18);
+
+// DARK BLUE
+doc.setTextColor(0,35,102);
+
+doc.text(
+"Attendance Summary",
+15,
+75
+);
+
+// SMALL LINE
+doc.setDrawColor(0,35,102);
+
+doc.line(
+15,
+79,
+85,
+79
+);
+
+// FOOTER
+doc.setFont("times","italic");
+doc.setFontSize(11);
+doc.setTextColor(100);
+
+doc.text(
+"Created by Sanjay",
+15,
+pageHeight - 15
+);
+
+// SAVE
+doc.save("SANZ_Attendance_Report.pdf");
 
 }
-
 function downloadExcel(){
 
 const data = [
-["Name","Date","Status"],
-
-["Sanjay",
-new Date().toLocaleDateString(),
-"Present"]
+["SANZ SECUREFACE AI"],
+["AI Attendance Report"],
+["Generated:", new Date().toLocaleString()],
+[],
+["No","Name","Date","Time","Match Type"]
 ];
+
+// DATA
+allAttendance.forEach((r, i) => {
+
+data.push([
+i + 1,
+r.name,
+r.date,
+r.time,
+r.matchType || "Exact Match"
+]);
+
+});
+
+// FOOTER
+data.push([]);
+data.push(["Created by Sanjay"]);
 
 const ws = XLSX.utils.aoa_to_sheet(data);
 
+// COLUMN WIDTH
+ws['!cols'] = [
+{ wch: 8 },
+{ wch: 25 },
+{ wch: 20 },
+{ wch: 18 },
+{ wch: 20 }
+];
+
+// TITLE STYLE
+ws["A1"].s = {
+font: {
+bold: true,
+sz: 24,
+color: { rgb: "002366" }
+}
+};
+
+// SUBTITLE STYLE
+ws["A2"].s = {
+font: {
+bold: true,
+italic: true,
+sz: 14,
+color: { rgb: "003399" }
+}
+};
+
+// TABLE HEADER STYLE
+["A5","B5","C5","D5","E5"].forEach(cell => {
+
+if(ws[cell]){
+
+ws[cell].s = {
+font: {
+bold: true,
+color: { rgb: "FFFFFF" }
+},
+fill: {
+fgColor: { rgb: "002366" }
+}
+};
+
+}
+
+});
+
+// FOOTER STYLE
+const footerRow = data.length;
+
+if(ws[`A${footerRow}`]){
+
+ws[`A${footerRow}`].s = {
+font: {
+italic: true,
+bold: true
+}
+};
+
+}
+
+// WORKBOOK
 const wb = XLSX.utils.book_new();
 
 XLSX.utils.book_append_sheet(
 wb,
 ws,
-"Attendance"
+"Attendance Report"
 );
 
+// DOWNLOAD
 XLSX.writeFile(
 wb,
-"attendance.xlsx"
+"SANZ_Attendance_Report.xlsx"
 );
 
 }
 
 function monthlyReport(){
 
-alert("📈 Monthly analytics coming soon!");
+const total = allAttendance.length;
+
+const today = new Date().toLocaleDateString();
+
+let reportText = `
+SANZ SECUREFACE AI
+
+Monthly Attendance Analytics
+
+Generated Date: ${today}
+
+--------------------------------
+
+Total Attendance Records: ${total}
+
+System Status: ACTIVE
+
+AI Face Recognition: ENABLED
+
+Cloud Database: CONNECTED
+
+--------------------------------
+
+Created by Sanjay
+`;
+
+const blob = new Blob(
+[reportText],
+{ type: "text/plain" }
+);
+
+const link = document.createElement("a");
+
+link.href = URL.createObjectURL(blob);
+
+link.download = "SANZ_Monthly_Report.txt";
+
+link.click();
 
 }
 

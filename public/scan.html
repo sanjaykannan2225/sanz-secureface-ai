@@ -850,6 +850,7 @@ async function loadModels() {
 
         if (data.success) {
           showToast(`✅ Attendance marked: ${name}`, 'success');
+          speak("Face matched successfully");
           playBeep();
           addToLog(name, data.record.time, matchType);
         } else if (data.duplicate) {

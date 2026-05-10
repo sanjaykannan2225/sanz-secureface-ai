@@ -806,6 +806,30 @@ opacity:1;
 transform:translateY(0);
 }
 }
+.loading-img{
+
+width:65px;
+height:65px;
+
+object-fit:cover;
+
+padding:0;
+
+border-radius:18px;
+
+background:#02111f;
+
+border:1px solid rgba(0,212,255,0.25);
+
+box-shadow:
+0 0 15px rgba(0,212,255,0.35),
+0 0 35px rgba(0,212,255,0.15);
+
+animation:logoFloat 3s ease-in-out infinite;
+
+overflow:hidden;
+
+}
   </style>
 </head>
 <body>
@@ -824,11 +848,26 @@ window.location.href = "login.html";
   <canvas id="particles-canvas"></canvas>
 
   <!-- Loading Screen -->
-  <div id="loading-screen">
-    <div class="loading-logo">⬡ SANZ SECUREFACE AI</div>
-    <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
-    <div class="loading-text">INITIALIZING AI SYSTEMS...</div>
-  </div>
+<div id="loading-screen">
+
+<img 
+src="uploads/logo3.png"
+class="loading-img"
+>
+
+<div class="loading-logo">
+⬡ SANZ SECUREFACE AI
+</div>
+
+<div class="loading-bar-wrap">
+<div class="loading-bar"></div>
+</div>
+
+<div class="loading-text">
+INITIALIZING AI SYSTEMS...
+</div>
+
+</div>
 
   <!-- Toast Container -->
   <div id="toast-container"></div>
