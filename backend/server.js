@@ -386,6 +386,10 @@ const attendance = await Attendance.find();
 });
     const todayAttendance = attendance.filter(a => a.date === today);
 
+    const activeNow = attendance.filter(
+a => a.active === true
+);
+
     // Weekly stats
     const weekStats = [];
     for (let i = 6; i >= 0; i--) {
@@ -398,13 +402,14 @@ const attendance = await Attendance.find();
       weekStats.push({ date: dateStr, count });
     }
 
-    res.json({
-      totalUsers: users.length,
-      todayCount: todayAttendance.length,
-      totalRecords: attendance.length,
-      weekStats,
-      recentAttendance: attendance.slice(-10).reverse()
-    });
+res.json({
+  totalUsers: users.length,
+  todayCount: todayAttendance.length,
+  totalRecords: attendance.length,
+  activeNow: activeNow.length,
+  weekStats,
+  recentAttendance: attendance.slice(-10).reverse()
+});
   } catch (err) {
     res.status(500).json({ error: 'Dashboard failed' });
   }

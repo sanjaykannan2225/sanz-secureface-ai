@@ -614,6 +614,11 @@ SANZ <span>SECUREFACE</span> AI
             <div class="stat-number amber" id="statRate">--%</div>
             <div class="stat-label">Attendance Rate</div>
           </div>
+          <div class="stat-card glass-card cyan">
+  <div class="stat-icon cyan">🟢</div>
+  <div class="stat-number cyan" id="statActive">0</div>
+  <div class="stat-label">Active In Class</div>
+</div>
         </div>
 
         <!-- Weekly Chart -->
@@ -625,6 +630,24 @@ SANZ <span>SECUREFACE</span> AI
             <div style="color: var(--text-muted); font-size: 0.8rem;">Loading chart...</div>
           </div>
         </div>
+
+        <div class="glass-card" style="padding:24px; margin-bottom:24px;">
+
+<div style="
+font-family:var(--font-mono);
+font-size:0.72rem;
+color:var(--neon-green);
+letter-spacing:2px;
+margin-bottom:16px;
+">
+🟢 ACTIVE IN CLASS
+</div>
+
+<div id="activeUsersList">
+Loading...
+</div>
+
+</div>
 
         <!-- Recent Attendance -->
         <div class="glass-card" style="padding: 24px;">
@@ -742,6 +765,7 @@ const d = await res.json();
         animateNum('statUsers', d.totalUsers);
         animateNum('statToday', d.todayCount);
         animateNum('statTotal', d.totalRecords);
+        animateNum('statActive', d.activeNow);
 
         const rate = d.totalUsers > 0 ? Math.round((d.todayCount / d.totalUsers) * 100) : 0;
         document.getElementById('statRate').textContent = rate + '%';
@@ -751,6 +775,7 @@ const d = await res.json();
 
         // Recent table
         renderRecentTable(d.recentAttendance || []);
+        renderActiveUsers(d.recentAttendance || []);
 
       } catch (e) {
         console.error('Dashboard error:', e);
@@ -788,7 +813,59 @@ const d = await res.json();
       }).join('');
     }
 
+    function renderActiveUsers(records){
+
+const active = records.filter(
+r => r.active === true
+);
+
+const box = document.getElementById(
+'activeUsersList'
+);
+
+if(!active.length){
+
+box.innerHTML = `
+<div style="color:var(--text-muted)">
+No active users in class
+</div>
+`;
+
+return;
+
+}
+
+box.innerHTML = active.map(r => `
+
+<div style="
+display:flex;
+justify-content:space-between;
+padding:12px 0;
+border-bottom:1px solid rgba(255,255,255,0.05);
+">
+
+<div style="color:#00ff88;">
+🟢 ${r.name}
+</div>
+
+<div style="
+font-family:var(--font-mono);
+color:var(--neon-blue);
+">
+IN: ${r.entryTime}
+</div>
+
+</div>
+
+`).join('');
+
+}
+
     function renderRecentTable(records) {
+
+
+
+
       const tbody = document.getElementById('recentTableBody');
       if (!records.length) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No records yet</td></tr>';
