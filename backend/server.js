@@ -40,13 +40,26 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 const attendanceSchema = new mongoose.Schema({
-  name: String,
-  date: String,
-  time: String,
-  matchType: String,
-  timestamp: String
-});
 
+  name: String,
+
+  date: String,
+
+  entryTime: String,
+
+  exitTime: String,
+
+  duration: String,
+
+  status: String,
+
+  active: Boolean,
+
+  matchType: String,
+
+  timestamp: String
+
+});
 const Attendance = mongoose.model("Attendance", attendanceSchema);
 
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
@@ -247,30 +260,63 @@ app.post('/api/attendance', async (req, res) => {
       hour12: false
     });
 
-    const alreadyMarked = await Attendance.findOne({
-      name,
-      date: today
-    });
+const existing = await Attendance.findOne({
+  name,
+  date: today,
+  active: true
+});
 
-    if (alreadyMarked) {
+if (existing) {
 
-      return res.json({
-        success: false,
-        message: 'Already marked today',
-        duplicate: true
-      });
+  const entry = new Date(`${today}T${existing.entryTime}`);
 
-    }
+  const diffMs = now - entry;
 
-    const record = await Attendance.create({
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
 
-      name,
-      date: today,
-      time,
-      matchType: matchType || 'Exact Match',
-      timestamp: now.toISOString()
+  const minutes = Math.floor(
+    (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+  );
 
-    });
+  existing.exitTime = time;
+
+  existing.duration = `${hours}h ${minutes}m`;
+
+  existing.status = "OUT";
+
+  existing.active = false;
+
+  await existing.save();
+
+  return res.json({
+    success: true,
+    exit: true,
+    record: existing
+  });
+
+}
+
+const record = await Attendance.create({
+
+  name,
+
+  date: today,
+
+  entryTime: time,
+
+  exitTime: "",
+
+  duration: "",
+
+  status: "IN",
+
+  active: true,
+
+  matchType: matchType || 'Exact Match',
+
+  timestamp: now.toISOString()
+
+});
 
     console.log(`📋 Attendance: ${name} at ${time}`);
 
@@ -368,11 +414,13 @@ const attendance = await Attendance.find();
 app.get('/api/export', async (req, res) => {
   try {
 const attendance = await Attendance.find();
-    let csv = 'Name,Date,Time,Match Type\n';
-    attendance.forEach(a => {
-      csv += `"${a.name}","${a.date}","${a.time}","${a.matchType}"\n`;
-    });
+let csv = 'Name,Date,Entry Time,Exit Time,Duration,Status\n';
 
+attendance.forEach(a => {
+
+  csv += `"${a.name}","${a.date}","${a.entryTime}","${a.exitTime}","${a.duration}","${a.status}"\n`;
+
+});
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=attendance.csv');
     res.send(csv);

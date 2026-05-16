@@ -637,7 +637,7 @@ SANZ <span>SECUREFACE</span> AI
           <div class="table-wrapper">
             <table class="data-table">
               <thead><tr>
-                <th>Name</th><th>Date</th><th>Time</th><th>Match</th>
+                <th>Name</th><th>Date</th><th>IN</th><th>OUT</th>
               </tr></thead>
               <tbody id="recentTableBody">
                 <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
@@ -662,10 +662,15 @@ SANZ <span>SECUREFACE</span> AI
           <div class="table-wrapper">
             <table class="data-table">
               <thead><tr>
-                <th>#</th><th>Name</th><th>Date</th><th>Time</th><th>Match Type</th>
+                <th>#</th>
+<th>Name</th>
+<th>Date</th>
+<th>IN</th>
+<th>OUT</th>
+<th>Status</th>
               </tr></thead>
               <tbody id="attendTableBody">
-                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -793,8 +798,8 @@ const d = await res.json();
         <tr>
           <td style="color:var(--text-primary); font-weight:700;">${r.name}</td>
           <td>${r.date}</td>
-          <td style="font-family:var(--font-mono);">${r.time}</td>
-          <td>${matchBadge(r.matchType)}</td>
+          <td style="font-family:var(--font-mono);">${r.entryTime || "-"}</td>
+<td style="font-family:var(--font-mono);">${r.exitTime || "-"}</td>
         </tr>
       `).join('');
     }
@@ -822,8 +827,17 @@ allAttendance = await res.json();
           <td style="color:var(--text-muted); font-family:var(--font-mono);">${i+1}</td>
           <td style="color:var(--text-primary); font-weight:700;">${r.name}</td>
           <td style="font-family:var(--font-mono);">${r.date}</td>
-          <td style="font-family:var(--font-mono);">${r.time}</td>
-          <td>${matchBadge(r.matchType)}</td>
+<td style="font-family:var(--font-mono);">
+${r.entryTime || "-"}
+</td>
+
+<td style="font-family:var(--font-mono);">
+${r.exitTime || "-"}
+</td>
+
+<td>
+${r.status || "IN"}
+</td>
         </tr>
       `).join('');
     }
@@ -1057,7 +1071,8 @@ y - 6,
 doc.text("No",20,y);
 doc.text("Name",40,y);
 doc.text("Date",95,y);
-doc.text("Time",145,y);
+doc.text("IN",125,y);
+doc.text("OUT",160,y);
 
 y += 12;
 
@@ -1087,11 +1102,15 @@ y
 );
 
 doc.text(
-String(r.time || ""),
-145,
+String(r.entryTime || ""),
+125,
 y
 );
-
+doc.text(
+String(r.exitTime || "-"),
+160,
+y
+);
 y += 10;
 
 });
@@ -1123,7 +1142,7 @@ const data = [
 ["AI Attendance Report"],
 ["Generated:", new Date().toLocaleString()],
 [],
-["No","Name","Date","Time","Match Type"]
+["No","Name","Date","IN","OUT","Status"]
 ];
 
 // DATA
@@ -1133,8 +1152,9 @@ data.push([
 i + 1,
 r.name,
 r.date,
-r.time,
-r.matchType || "Exact Match"
+r.entryTime || "",
+r.exitTime || "-",
+r.status || "IN"
 ]);
 
 });
@@ -1174,7 +1194,7 @@ color: { rgb: "003399" }
 };
 
 // TABLE HEADER STYLE
-["A5","B5","C5","D5","E5"].forEach(cell => {
+["A5","B5","C5","D5","E5","F5"].forEach(cell => {
 
 if(ws[cell]){
 
