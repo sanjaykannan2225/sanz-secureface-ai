@@ -146,10 +146,10 @@ res.json({
 
 } catch (e) {
 
-console.error(e);
+console.error("REGISTER ERROR:", e);
 
 res.status(500).json({
-error: 'Registration failed'
+error: e.message
 });
 
 }
