@@ -103,6 +103,9 @@ error: err.message || 'Image upload failed'
 
 try {
 
+  console.log(req.body);
+console.log(req.file);
+
 const { name, descriptor } = req.body;
 
 if (!name || !req.file) {
@@ -127,8 +130,8 @@ error: 'User already registered'
 
 const savedUser = await User.create({
   name: name.trim(),
-image: req.file.path,
-  descriptors: [JSON.parse(descriptor)],
+  image: req.file.secure_url || req.file.path,
+  descriptors: descriptor ? [JSON.parse(descriptor)] : [],
   registeredAt: new Date().toLocaleString('en-IN', {
     timeZone: 'Asia/Kolkata'
   })
