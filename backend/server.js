@@ -34,8 +34,9 @@ const userSchema = new mongoose.Schema({
   image: String,
   descriptors: [[Number]],
   registeredAt: String
+}, {
+  versionKey: false
 });
-
 const User = mongoose.model("User", userSchema);
 
 const attendanceSchema = new mongoose.Schema({
