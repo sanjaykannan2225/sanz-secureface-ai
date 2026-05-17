@@ -57,13 +57,25 @@ const attendanceSchema = new mongoose.Schema({
 
   matchType: String,
 
-  timestamp: String
+  timestamp: String,
+
+  totalActiveMinutes: {
+    type: Number,
+    default: 0
+  },
+
+  outsideCount: {
+    type: Number,
+    default: 0
+  }
+  
 
 });
-const Attendance = mongoose.model("Attendance", attendanceSchema);
 
-if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-
+const Attendance = mongoose.model(
+  "Attendance",
+  attendanceSchema
+);
 // Multer config
 
 const storage = new CloudinaryStorage({
@@ -282,6 +294,11 @@ if (existing) {
 
   existing.duration = `${hours}h ${minutes}m`;
 
+  existing.totalActiveMinutes =
+(hours * 60) + minutes;
+
+existing.outsideCount += 1;
+
   existing.status = "OUT";
 
   existing.active = false;
@@ -408,7 +425,9 @@ res.json({
   totalRecords: attendance.length,
   activeNow: activeNow.length,
   weekStats,
-  recentAttendance: attendance.slice(-10).reverse()
+  recentAttendance: attendance.slice(-10).reverse(),
+  records: attendance
+  
 });
   } catch (err) {
     res.status(500).json({ error: 'Dashboard failed' });
@@ -463,6 +482,89 @@ success: false
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
+
+const axios = require("axios");
+
+app.post("/api/ai-chat", async (req, res) => {
+
+try {
+
+const { message } = req.body;
+
+const response = await axios.post(
+
+"https://openrouter.ai/api/v1/chat/completions",
+
+{
+model: "openai/gpt-3.5-turbo",
+
+messages: [
+
+{
+role: "system",
+
+content: `
+You are SANZ SecureFace AI assistant.
+
+This website contains:
+
+- Face recognition attendance
+- Live scan
+- Dashboard
+- Activity analytics
+- MongoDB storage
+- PDF export
+- Student tracking
+
+Answer only about this website.
+`
+},
+
+{
+role: "user",
+content: message
+}
+
+]
+
+},
+
+{
+headers: {
+
+  Authorization:
+`Bearer ${process.env.OPENROUTER_API_KEY}`,
+
+
+"Content-Type":
+"application/json"
+
+}
+}
+
+);
+
+const reply =
+response.data.choices[0].message.content;
+
+res.json({
+reply
+});
+
+}
+
+catch(err){
+
+console.log(err);
+
+res.status(500).json({
+reply:"AI server error"
+});
+
+}
+
+});
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Sanz SecureFace AI running at http://localhost:${PORT}`);

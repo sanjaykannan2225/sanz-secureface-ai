@@ -830,6 +830,148 @@ animation:logoFloat 3s ease-in-out infinite;
 overflow:hidden;
 
 }
+
+/* NEW AI CHAT */
+
+.ai-btn{
+position:fixed;
+bottom:25px;
+right:25px;
+width:58px;
+height:58px;
+font-size:24px;
+border:none;
+border-radius:50%;
+background:linear-gradient(135deg,#00d4ff,#7b2cff,#ff00aa);
+
+animation:aiGlow 3s infinite;
+color:white;
+font-size:30px;
+cursor:pointer;
+z-index:99999;
+box-shadow:0 0 25px rgba(0,212,255,0.6);
+}
+@keyframes aiGlow{
+
+0%{
+transform:scale(1);
+box-shadow:0 0 20px #00d4ff;
+}
+
+50%{
+transform:scale(1.08);
+box-shadow:0 0 35px #7b2cff;
+}
+
+100%{
+transform:scale(1);
+box-shadow:0 0 20px #00d4ff;
+}
+from{
+opacity:0;
+transform:translateY(10px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.ai-popup{
+position:fixed;
+bottom:110px;
+right:25px;
+width:300px;
+height:430px;
+background:rgba(6,17,31,0.96);
+border-radius:22px;
+background:#06111f;
+border:1px solid rgba(0,212,255,0.3);
+border-radius:20px;
+display:none;
+flex-direction:column;
+overflow:hidden;
+z-index:99999;
+box-shadow:0 0 40px rgba(0,212,255,0.2);
+}
+
+.ai-header{
+padding:16px;
+background:#08192b;
+color:#00d4ff;
+font-weight:bold;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.ai-messages{
+flex:1;
+padding:16px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.ai-msg{
+font-size:13px;
+padding:11px 14px;
+border-radius:16px;
+line-height:1.5;
+max-width:85%;
+animation:fadeMsg 0.3s ease;
+}
+
+.bot{
+background:#10243d;
+color:white;
+align-self:flex-start;
+}
+
+.user{
+background:#00d4ff;
+color:black;
+align-self:flex-end;
+}
+
+.ai-input-box{
+display:flex;
+gap:10px;
+padding:12px;
+background:#08192b;
+}
+
+.ai-input-box input{
+flex:1;
+padding:11px 14px;
+background:#0f1e33;
+border:none;
+border-radius:12px;
+color:white;
+outline:none;
+}
+
+.ai-input-box button{
+padding:12px 18px;
+border:none;
+border-radius:10px;
+background:#00d4ff;
+color:black;
+font-weight:bold;
+cursor:pointer;
+}
+
+@media(max-width:768px){
+
+.ai-popup{
+width:92%;
+right:4%;
+height:75vh;
+}
+
+}
   </style>
 </head>
 <body>
@@ -896,6 +1038,7 @@ SANZ <span>SECUREFACE</span> AI
 <li><a href="scan.html">Live Scan</a></li>
 <li><a href="register.html">Register</a></li>
 <li><a href="dashboard.html">Dashboard</a></li>
+<li><a href="activity.html">ACTIVITY</a></li>
 <li><a href="about.html">ABOUT</a></li>
 <li><a href="features.html">FEATURES</a></li>
 <li><a href="user-guide.html">USER GUIDE</a></li>
@@ -1261,86 +1404,7 @@ window.addEventListener("load", () => {
     }, 1000);
 });
 </script>
-<!-- AI CHATBOT -->
 
-<div class="ai-chatbot">
-
-<div class="chatbot-btn" onclick="toggleChatbot()">
-🤖
-</div>
-
-<div class="chatbot-box" id="chatbotBox">
-
-<div class="chatbot-header">
-SANZ AI ASSISTANT
-</div>
-
-<div class="chatbot-body" id="chatBody">
-
-<div class="bot-msg">
-⚡ AI Assistant Activated <br>
-System ready for commands.
-</div>
-
-</div>
-
-<div class="chatbot-options">
-
-<button onclick="botReply('scan')">
-Live Scan
-</button>
-
-<button onclick="botReply('register')">
-Register
-</button>
-
-<button onclick="botReply('dashboard')">
-Dashboard
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-<script>
-
-function toggleChatbot(){
-
-document
-.getElementById("chatbotBox")
-.classList.toggle("show");
-
-}
-
-function botReply(type){
-
-const body = document.getElementById("chatBody");
-
-let msg = "";
-
-if(type === "scan"){
-msg = "📷 Live Scan helps detect faces in real time.";
-}
-
-if(type === "register"){
-msg = "🧠 Register section stores AI face embeddings.";
-}
-
-if(type === "dashboard"){
-msg = "📊 Dashboard shows attendance analytics.";
-}
-
-body.innerHTML += `
-<div class="bot-msg">${msg}</div>
-`;
-
-body.scrollTop = body.scrollHeight;
-
-}
-
-</script>
 
 <script>
 
@@ -1352,6 +1416,123 @@ navigator.serviceWorker
 .then(() => console.log("PWA Ready"));
 
 }
+
+</script>
+
+<!-- NEW AI BUTTON -->
+
+<button id="aiBtn" class="ai-btn">
+🤖
+</button>
+
+<!-- AI CHAT WINDOW -->
+
+<div id="aiPopup" class="ai-popup">
+
+<div class="ai-header">
+SANZ AI ASSISTANT
+
+<span id="closeAI">✕</span>
+</div>
+
+<div class="ai-messages" id="aiMessages">
+
+<div class="ai-msg bot">
+🤖 Welcome to SANZ AI.
+Ask me about attendance,
+students, analytics,
+live activity and reports.
+</div>
+
+</div>
+
+<div class="ai-input-box">
+
+<input
+type="text"
+id="aiInput"
+placeholder="Ask AI..."
+>
+
+<button id="sendAI">
+Send
+</button>
+
+</div>
+
+</div>
+<script>
+
+const aiBtn =
+document.getElementById("aiBtn");
+
+const aiPopup =
+document.getElementById("aiPopup");
+
+const closeAI =
+document.getElementById("closeAI");
+
+aiBtn.onclick = () => {
+
+aiPopup.style.display = "flex";
+
+};
+
+closeAI.onclick = () => {
+
+aiPopup.style.display = "none";
+
+};
+
+async function sendAIMessage(){
+
+const input =
+document.getElementById("aiInput");
+
+const msg = input.value.trim();
+
+if(!msg) return;
+
+const box =
+document.getElementById("aiMessages");
+
+box.innerHTML += `
+<div class="ai-msg user">
+${msg}
+</div>
+`;
+
+input.value = "";
+
+const res = await fetch("http://localhost:5000/api/ai-chat",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+message:msg
+})
+
+});
+
+const data = await res.json();
+
+box.innerHTML += `
+<div class="ai-msg bot">
+${data.reply}
+</div>
+`;
+
+box.scrollTop = box.scrollHeight;
+
+}
+
+document
+.getElementById("sendAI")
+.addEventListener("click",sendAIMessage);
 
 </script>
 </body>
