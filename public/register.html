@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Register Face — Sanz SecureFace AI</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="uploads/logo (2).png">
   <style>
     .register-page {
       min-height: 100vh;
@@ -446,8 +447,18 @@ SANZ <span>SECUREFACE</span> AI
 
               <div class="upload-zone" id="uploadZone"
                 ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)">
-                <input type="file" id="imageInput" accept="image/*"
-                  onchange="previewImage(event)" required />
+<input type="file"
+
+id="photoInput"
+
+accept="image/*"
+
+capture="user"
+
+onchange="previewImage(event)"
+
+required
+/>
                 <div class="upload-icon">📷</div>
                 <div class="upload-text">CLICK OR DRAG IMAGE</div>
                 <div class="upload-sub">JPG, PNG, WEBP up to 10MB</div>
@@ -514,6 +525,21 @@ style="margin-top:10px;display:none;justify-content:center;">
   </div>
 
   <script>
+
+    // LOAD AI MODELS ONLY ONCE
+
+async function loadModels(){
+
+await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+
+await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+
+await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+
+console.log("AI Models Loaded");
+
+}
+
     function updateClock() {
       document.getElementById('navClock').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
     }
@@ -544,7 +570,11 @@ const captureBtn = document.getElementById('captureBtn');
 try {
 
 const stream = await navigator.mediaDevices.getUserMedia({
-video: true
+video: {
+facingMode: "user",
+width: { ideal: 640 },
+height: { ideal: 480 }
+}
 });
 
 video.srcObject = stream;
@@ -569,11 +599,11 @@ const canvas = document.getElementById('snapshotCanvas');
 
 const ctx = canvas.getContext('2d');
 
-canvas.width = video.videoWidth;
+canvas.width = 640;
 
-canvas.height = video.videoHeight;
+canvas.height = 480;
 
-ctx.drawImage(video, 0, 0);
+ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
 canvas.toBlob(blob => {
 
@@ -587,17 +617,23 @@ const dt = new DataTransfer();
 
 dt.items.add(file);
 
-const input = document.getElementById('imageInput');
+const input = document.getElementById('photoInput');
 
 input.files = dt.files;
 
+setTimeout(()=>{
+
 previewImage({ target: input });
+
+},500);
 
 showToast('Photo captured successfully', 'success');
 
 }, 'image/jpeg');
 
+if(video.srcObject){
 video.srcObject.getTracks().forEach(track => track.stop());
+}
 
 video.style.display = 'none';
 
@@ -613,7 +649,7 @@ document.getElementById('captureBtn').style.display = 'none';
       dragLeave();
       const file = e.dataTransfer.files[0];
       if (file && file.type.startsWith('image/')) {
-        const input = document.getElementById('imageInput');
+        const input = document.getElementById('photoInput');
         const dt = new DataTransfer();
         dt.items.add(file);
         input.files = dt.files;
@@ -623,11 +659,9 @@ document.getElementById('captureBtn').style.display = 'none';
 
     async function handleRegister(e) {
       e.preventDefault();
-      await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+
       const name = document.getElementById('nameInput').value.trim();
-      const imageFile = document.getElementById('imageInput').files[0];
+      const imageFile = document.getElementById('photoInput').files[0];
       if (!name || !imageFile) return showToast('Please fill all fields', 'error');
 
       const btn = document.getElementById('submitBtn');
@@ -650,12 +684,22 @@ await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
 const detection = await faceapi
   .detectSingleFace(
     img,
-    new faceapi.TinyFaceDetectorOptions()
-  )
-  .withFaceLandmarks()
-  .withFaceDescriptor();
+new faceapi.TinyFaceDetectorOptions({
 
-if (!detection) {
+inputSize:160,
+
+scoreThreshold:0.3
+
+})
+  )
+.withFaceLandmarks()
+.withFaceDescriptor();
+
+if (!detection){
+
+clearInterval(progInterval);
+
+pw.classList.remove('visible');
 
 showToast('No face detected', 'error');
 
@@ -718,6 +762,7 @@ function closeSuccess() {
   document.getElementById('progressWrap').style.display = 'none';
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitBtn').textContent = '🆔 REGISTER FACE';
+  document.getElementById('progressBar').style.width = '0%';
 }
 
     async function loadRegisteredUsers() {
@@ -803,5 +848,13 @@ window.speechSynthesis.speak(speech);
 </script>
 
 <script defer src="js/face-api.min.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", async () => {
+
+await loadModels();
+
+});
+
+</script>
 </body>
 </html>

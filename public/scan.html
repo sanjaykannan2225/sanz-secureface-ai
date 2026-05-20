@@ -930,8 +930,23 @@ async function loadModels() {
       }
     }
 
-    init();
-  </script>
+init();
+
+// FULLSCREEN MODE
+window.onload = () => {
+
+document.documentElement.requestFullscreen();
+
+};
+
+// AUTO REFRESH EVERY 5 MINUTES
+setInterval(() => {
+
+location.reload();
+
+},300000);
+
+</script>
 
 <script>
 
@@ -942,7 +957,7 @@ localStorage.removeItem("loggedIn");
 window.location.href = "login.html";
 
 }
-
+  
 </script>
 
 <!-- SECURITY ALERT -->
