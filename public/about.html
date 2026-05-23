@@ -536,9 +536,8 @@ SANZ <span>SECUREFACE</span> AI
 <li><a href="activity.html">ACTIVITY</a></li>
 <a href="about.html" style="color:#00d9ff;">ABOUT</a>
 <a href="features.html">FEATURES</a>
-<a href="user-guide.html">USER GUIDE</a
-
-<a href="#" onclick="logout()">LOGOUT</a>
+<a href="user-guide.html">USER GUIDE</a>
+<a href="javascript:void(0)" onclick="logout(event)">Logout</a>
 
 </div>
 
@@ -626,13 +625,16 @@ SANZ <span>SECUREFACE</span> AI
     © 2026 SANZ SECUREFACE AI • Developed By Sanjay
   </div>
 
-  <script>
+<script>
 
-function logout(){
+function logout(e){
 
-localStorage.removeItem("loggedIn");
+if(e) e.preventDefault();
 
-window.location.href = "login.html";
+localStorage.clear();
+sessionStorage.clear();
+
+window.location.replace("login.html");
 
 }
 

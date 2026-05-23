@@ -14,27 +14,27 @@
 body{
 background:#020617;
 color:white;
-padding-top:82px;
+padding-top:60px;
 overflow-x:hidden;
 }
     /* ── HERO ─────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-     padding:170px 20px 60px;
-      position: relative;
-    }
+.hero {
+  min-height: 75vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:60px 20px 20px;
+  position:relative;
+}
 
-    .hero-content {
-      max-width: 1200px;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
+.hero-content {
+  max-width:1000px;
+  width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  align-items:center;
+}
 
     .hero-eyebrow {
       display: inline-flex;
@@ -62,13 +62,13 @@ overflow-x:hidden;
       text-transform: uppercase;
     }
 
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem, 5vw, 4.5rem);
-      font-weight: 900;
-      line-height: 1.05;
-      margin-bottom: 24px;
-    }
+.hero-title {
+font-family:var(--font-display);
+font-size:clamp(2rem,3.3vw,3.2rem);
+font-weight:900;
+line-height:1;
+margin-bottom:18px;
+}
 
     .hero-title .line-2 {
       color: var(--neon-blue);
@@ -82,13 +82,13 @@ overflow-x:hidden;
       background-clip: text;
     }
 
-    .hero-desc {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      line-height: 1.8;
-      margin-bottom: 40px;
-      max-width: 480px;
-    }
+.hero-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 30px;
+  max-width: 430px;
+}
 
     .hero-buttons {
       display: flex;
@@ -129,8 +129,8 @@ overflow-x:hidden;
 
     .face-scanner {
       position: relative;
-      width: 320px;
-      height: 320px;
+      width: 260px;
+      height: 260px;
     }
 
     .scanner-ring {
@@ -210,15 +210,15 @@ overflow-x:hidden;
       100% { top: calc(100% - 60px); opacity: 0; }
     }
 
-    .scanner-data {
-      position: absolute;
-      right: -80px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+.scanner-data {
+  position: absolute;
+  right: -55px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
     .data-item {
       background: rgba(0,212,255,0.06);
@@ -411,14 +411,18 @@ filter:drop-shadow(0 0 12px rgba(0,212,255,0.7));
 .nav-brand{
 display:flex;
 align-items:center;
-gap:12px;
+gap:14px;
 text-decoration:none;
+flex-shrink:0;
+white-space:nowrap;
 }
 
 .nav-brand-text{
-font-size:24px;
-font-weight:bold;
+font-size:22px;
+font-weight:700;
 color:white;
+white-space:nowrap;
+line-height:1;
 }
 
 .nav-brand-text span{
@@ -429,18 +433,47 @@ color:#00d4ff;
 display:flex;
 align-items:center;
 justify-content:space-between;
-gap:20px;
-padding:18px 30px;
-flex-wrap:wrap;
+padding:14px 40px;
+gap:30px;
+flex-wrap:nowrap;
+overflow:visible;
 }
 /* ───────────────── MOBILE RESPONSIVE ───────────────── */
 
 @media(max-width:900px){
 
+.ai-popup{
+width:92%;
+max-width:360px;
+height:520px;
+right:4%;
+bottom:90px;
+border-radius:22px;
+
+background:rgba(6,18,35,0.55) !important;
+backdrop-filter:blur(18px) saturate(140%) !important;
+-webkit-backdrop-filter:blur(18px) saturate(140%) !important;
+
+border:1px solid rgba(0,212,255,0.18);
+box-shadow:
+0 0 25px rgba(0,212,255,0.12),
+0 10px 35px rgba(0,0,0,0.45);
+}
+
+.ai-messages{
+background:transparent !important;
+}
+
+.ai-input-box{
+background:rgba(8,25,43,0.55) !important;
+backdrop-filter:blur(10px);
+-webkit-backdrop-filter:blur(10px);
+}
+
 /* HERO */
 
 .hero{
-padding:120px 20px 60px;
+padding:30px 20px 40px;
 }
 
 .hero-content{
@@ -547,8 +580,8 @@ height:40px;
 
 .nav-links{
 position:fixed;
-top:82px;
-left:-100%;
+top:72px;
+left:0;
 width:100%;
 background:#020617;
 flex-direction:column;
@@ -556,12 +589,17 @@ align-items:center;
 padding:0;
 gap:20px;
 display:flex;
-transition:0.4s ease;
+transition:0.35s ease;
 border-top:1px solid rgba(0,212,255,0.1);
-z-index:999;
+z-index:9999;
+
 height:0;
 overflow:hidden;
 opacity:0;
+pointer-events:none;
+transform:translateY(-10px);
+margin:0;
+list-style:none;
 }
 .nav-links a{
 position:relative;
@@ -601,11 +639,13 @@ color:#00d4ff;
 }
 
 .nav-links.open{
-left:0;
+display:flex;
 height:auto;
-padding:25px 0;
+max-height:500px;
+padding:22px 0;
 opacity:1;
 pointer-events:auto;
+transform:translateY(0);
 }
 .nav-burger{
 display:flex;
@@ -614,16 +654,22 @@ gap:5px;
 background:none;
 border:none;
 cursor:pointer;
-
 position:relative;
-z-index:10001;
-
+z-index:100002 !important;
+pointer-events:auto !important;
 margin-left:auto;
 }
 
 .nav-clock{
-width:100%;
-text-align:center;
+width:auto;
+margin-left:15px;
+font-size:15px;
+font-family:monospace;
+color:#00e5ff;
+white-space:nowrap;
+flex-shrink:0;
+min-width:90px;
+text-align:right;
 }
 
 /* FEATURES */
@@ -676,6 +722,10 @@ gap:5px;
 background:none;
 border:none;
 cursor:pointer;
+position:relative;
+z-index:100002 !important;
+pointer-events:auto !important;
+margin-left:auto;
 }
 
 .nav-burger span{
@@ -700,10 +750,15 @@ background:none;
 width:auto;
 padding:0;
 border:none;
-left:0 !important;
-gap:18px;
-flex-wrap:wrap;
+gap:10px;
+flex-wrap:nowrap;
+white-space:nowrap;
 height:auto;
+opacity:1;
+pointer-events:auto;
+transform:none;
+overflow:visible;
+margin-left:auto;
 }
 
 }
@@ -880,35 +935,44 @@ transform:translateY(0);
 
 .ai-popup{
 position:fixed;
-bottom:110px;
-right:25px;
-width:300px;
-height:430px;
-background:rgba(6,17,31,0.96);
-border-radius:22px;
-background:#06111f;
-border:1px solid rgba(0,212,255,0.3);
-border-radius:20px;
+bottom:95px;
+right:80px;
+width:350px;
+height:500px;
+
+background:rgba(6,18,35,0.55);
+backdrop-filter:blur(18px) saturate(140%);
+-webkit-backdrop-filter:blur(18px) saturate(140%);
+
+border:1px solid rgba(0,212,255,0.18);
+border-radius:24px;
+
 display:none;
 flex-direction:column;
 overflow:hidden;
 z-index:99999;
-box-shadow:0 0 40px rgba(0,212,255,0.2);
+
+box-shadow:
+0 0 25px rgba(0,212,255,0.12),
+0 12px 40px rgba(0,0,0,0.45);
 }
 
 .ai-header{
-padding:16px;
-background:#08192b;
+padding:14px 16px;
+background:linear-gradient(90deg,#08192b,#10243d);
 color:#00d4ff;
-font-weight:bold;
+font-weight:700;
 display:flex;
 justify-content:space-between;
 align-items:center;
+border-bottom:1px solid rgba(0,212,255,0.15);
+box-shadow:0 0 15px rgba(0,212,255,0.12);
 }
 
 .ai-messages{
 flex:1;
-padding:16px;
+height:100%;
+padding:14px;
 overflow-y:auto;
 display:flex;
 flex-direction:column;
@@ -916,7 +980,7 @@ gap:12px;
 }
 
 .ai-msg{
-font-size:13px;
+font-size:11px;
 padding:11px 14px;
 border-radius:16px;
 line-height:1.5;
@@ -924,28 +988,102 @@ max-width:85%;
 animation:fadeMsg 0.3s ease;
 }
 
+.typing{
+display:flex;
+gap:5px;
+align-items:center;
+padding:4px 0;
+}
+
+.typing span{
+width:8px;
+height:8px;
+border-radius:50%;
+background:#00d4ff;
+animation:typingDots 1.2s infinite;
+}
+
+.typing span:nth-child(2){
+animation-delay:0.2s;
+}
+
+.typing span:nth-child(3){
+animation-delay:0.4s;
+}
+
+@keyframes typingDots{
+
+0%,80%,100%{
+transform:scale(0.7);
+opacity:0.4;
+}
+
+40%{
+transform:scale(1);
+opacity:1;
+}
+
+}
+
 .bot{
-background:#10243d;
+background:rgba(16,36,61,0.85);
 color:white;
 align-self:flex-start;
+border:1px solid rgba(0,212,255,0.08);
+box-shadow:0 0 10px rgba(0,212,255,0.08);
+}
+
+.reply-wrap{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.ai-title{
+font-size:13px;
+font-weight:700;
+color:#00d4ff;
+margin-bottom:6px;
+text-shadow:0 0 10px rgba(0,212,255,0.35);
+}
+
+@keyframes botTyping{
+
+0%{
+opacity:0.5;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+opacity:0.5;
+}
+
 }
 
 .user{
-background:#00d4ff;
-color:black;
+background:linear-gradient(135deg,#00d4ff,#00a3ff);
+color:#02111f;
 align-self:flex-end;
+font-weight:600;
+box-shadow:0 0 12px rgba(0,212,255,0.25);
 }
 
 .ai-input-box{
 display:flex;
+align-items:center;
 gap:10px;
 padding:12px;
-background:#08192b;
+background:rgba(8,25,43,0.75);
+border-top:1px solid rgba(0,212,255,0.08);
 }
 
 .ai-input-box input{
-flex:1;
-padding:11px 14px;
+width:100%;
+min-width:0;
+padding:10px 12px;
 background:#0f1e33;
 border:none;
 border-radius:12px;
@@ -954,21 +1092,52 @@ outline:none;
 }
 
 .ai-input-box button{
-padding:12px 18px;
+min-width:65px;
+padding:10px 12px;
 border:none;
 border-radius:10px;
 background:#00d4ff;
 color:black;
 font-weight:bold;
 cursor:pointer;
+flex-shrink:0;
 }
 
 @media(max-width:768px){
 
 .ai-popup{
-width:92%;
+position:fixed;
+bottom:90px;
 right:4%;
-height:75vh;
+width:92%;
+max-width:360px;
+height:520px;
+
+background:rgba(6,18,35,0.55) !important;
+backdrop-filter:blur(18px) saturate(140%) !important;
+-webkit-backdrop-filter:blur(18px) saturate(140%) !important;
+
+border:1px solid rgba(0,212,255,0.18);
+border-radius:24px;
+
+display:none;
+flex-direction:column;
+overflow:hidden;
+z-index:99999;
+
+box-shadow:
+0 0 25px rgba(0,212,255,0.12),
+0 12px 40px rgba(0,0,0,0.45);
+}
+
+.ai-messages{
+background:transparent !important;
+}
+
+.ai-input-box{
+background:rgba(8,25,43,0.55) !important;
+backdrop-filter:blur(10px);
+-webkit-backdrop-filter:blur(10px);
 }
 
 }
@@ -1027,7 +1196,7 @@ SANZ <span>SECUREFACE</span> AI
 
 </a>
 
-<button class="nav-burger" onclick="toggleNav()">
+<button class="nav-burger" id="burgerBtn" onclick="toggleNav()">
 <span></span>
 <span></span>
 <span></span>
@@ -1298,11 +1467,14 @@ onclick="speak('Opening dashboard')">
     }
     setInterval(updateClock, 1000);
     updateClock();
+function toggleNav(){
 
-    function toggleNav() {
-      document.getElementById('navLinks').classList.toggle('open');
-    }
+const nav =
+document.getElementById("navLinks");
 
+nav.classList.toggle("open");
+
+}
     // Fetch stats
     async function loadStats() {
       try {
@@ -1430,7 +1602,16 @@ navigator.serviceWorker
 <div id="aiPopup" class="ai-popup">
 
 <div class="ai-header">
+<div>
 SANZ AI ASSISTANT
+<div style="
+font-size:11px;
+color:#00ff88;
+margin-top:3px;
+">
+● Online
+</div>
+</div>
 
 <span id="closeAI">✕</span>
 </div>
@@ -1472,11 +1653,24 @@ document.getElementById("aiPopup");
 const closeAI =
 document.getElementById("closeAI");
 
+const aiInput =
+document.getElementById("aiInput");
+
+const sendAI =
+document.getElementById("sendAI");
+
+const box =
+document.getElementById("aiMessages");
+
+/* OPEN */
+
 aiBtn.onclick = () => {
 
 aiPopup.style.display = "flex";
 
 };
+
+/* CLOSE */
 
 closeAI.onclick = () => {
 
@@ -1484,17 +1678,16 @@ aiPopup.style.display = "none";
 
 };
 
+/* SEND FUNCTION */
+
 async function sendAIMessage(){
 
-const input =
-document.getElementById("aiInput");
-
-const msg = input.value.trim();
+const msg =
+aiInput.value.trim();
 
 if(!msg) return;
 
-const box =
-document.getElementById("aiMessages");
+/* USER MSG */
 
 box.innerHTML += `
 <div class="ai-msg user">
@@ -1502,9 +1695,34 @@ ${msg}
 </div>
 `;
 
-input.value = "";
+aiInput.value = "";
 
-const res = await fetch("/api/ai-chat",{
+box.scrollTop =
+box.scrollHeight;
+
+/* THINKING */
+
+const loadingId =
+"load" + Date.now();
+
+box.innerHTML += `
+<div class="ai-msg bot"
+id="${loadingId}">
+<div class="typing">
+<span></span>
+<span></span>
+<span></span>
+</div>
+</div>
+`;
+
+box.scrollTop =
+box.scrollHeight;
+
+try{
+
+const res =
+await fetch("/api/ai-chat",{
 
 method:"POST",
 
@@ -1518,21 +1736,80 @@ message:msg
 
 });
 
-const data = await res.json();
+const data =
+await res.json();
+
+/* REMOVE THINKING */
+
+const loadEl =
+document.getElementById(loadingId);
+
+if(loadEl)
+loadEl.remove();
+
+/* AI REPLY */
+
+const formattedReply = data.reply
+.replace(/\*\*(.*?)\*\*/g,
+'<div class="ai-title">✨ $1</div>')
+.replace(/\n/g,'<br>')
+.replace(/^\s*[-•]/gm,'🔹')
+.replace(/1\./g,'🔹')
+.replace(/2\./g,'🔹')
+.replace(/3\./g,'🔹')
+.replace(/4\./g,'🔹')
+.replace(/5\./g,'🔹')
+.replace(/important/gi,'⚡ Important')
+.replace(/note/gi,'📝 Note');
 
 box.innerHTML += `
 <div class="ai-msg bot">
-${data.reply}
+<div class="reply-wrap">
+🤖 ${formattedReply}
+</div>
 </div>
 `;
+}catch(err){
 
-box.scrollTop = box.scrollHeight;
+const loadEl =
+document.getElementById(loadingId);
+
+if(loadEl){
+
+loadEl.innerHTML =
+"⚠ AI unavailable";
 
 }
 
-document
-.getElementById("sendAI")
-.addEventListener("click",sendAIMessage);
+}
+
+/* AUTO SCROLL */
+
+box.scrollTop =
+box.scrollHeight;
+
+}
+
+/* BUTTON CLICK */
+
+sendAI.addEventListener(
+"click",
+sendAIMessage
+);
+
+/* ENTER KEY */
+
+aiInput.addEventListener(
+"keypress",
+function(e){
+
+if(e.key === "Enter"){
+
+sendAIMessage();
+
+}
+
+});
 
 </script>
 </body>

@@ -484,45 +484,90 @@ app.get('/', (req, res) => {
 });
 
 const axios = require("axios");
-
 app.post("/api/ai-chat", async (req, res) => {
 
 try {
 
 const { message } = req.body;
 
-const response = await axios.post(
+const users = await User.find();
+const attendance = await Attendance.find();
+
+const activeUsers =
+attendance.filter(a => a.active).length;
+
+const today =
+new Date().toLocaleDateString(
+'en-CA',
+{ timeZone:'Asia/Kolkata' }
+);
+
+const todayAttendance =
+attendance.filter(
+a => a.date === today
+);
+
+const dashboardData = {
+totalUsers: users.length,
+todayAttendance:
+todayAttendance.length,
+totalAttendance:
+attendance.length,
+activeUsers,
+recentAttendance:
+attendance.slice(-5)
+};
+
+const response =
+await axios.post(
 
 "https://openrouter.ai/api/v1/chat/completions",
 
 {
-model: "openai/gpt-3.5-turbo",
+model:"openai/gpt-3.5-turbo",
 
-messages: [
+messages:[
 
 {
-role: "system",
+role:"system",
+content:`
 
-content: `
-You are SANZ SecureFace AI assistant.
+You are SANZ SecureFace AI Analyst 🤖
 
-This website contains:
+Analyse REAL website and MongoDB data only.
 
-- Face recognition attendance
-- Live scan
-- Dashboard
-- Activity analytics
-- MongoDB storage
-- PDF export
-- Student tracking
+Current dashboard data:
+${JSON.stringify(dashboardData)}
 
-Answer only about this website.
+Rules:
+
+✅ Use real website data only
+✅ Never create fake numbers
+✅ Analyse trends and patterns
+✅ Use emojis and bullet points
+✅ Give stylish and modern answers
+✅ Explain dashboard statistics
+✅ Explain attendance and user activity
+✅ Mention active users and recent activity
+✅ Speak like a premium AI analyst
+✅ Keep answers attractive and easy to read
+
+If user asks:
+- registered users
+- attendance
+- active users
+- dashboard report
+- trends
+- website performance
+
+Use the live data above and analyse it.
+
 `
 },
 
 {
-role: "user",
-content: message
+role:"user",
+content:message
 }
 
 ]
@@ -530,41 +575,38 @@ content: message
 },
 
 {
-headers: {
-
-  Authorization:
+headers:{
+Authorization:
 `Bearer ${process.env.OPENROUTER_API_KEY}`,
-
-
 "Content-Type":
 "application/json"
-
 }
 }
 
 );
 
 const reply =
-response.data.choices[0].message.content;
+response.data
+.choices[0]
+.message
+.content;
 
 res.json({
 reply
 });
 
 }
-
 catch(err){
 
 console.log(err);
 
 res.status(500).json({
-reply:"AI server error"
+reply:"AI analyse failed"
 });
 
 }
 
 });
-
 
 app.listen(PORT, () => {
   console.log(`🚀 Sanz SecureFace AI running at http://localhost:${PORT}`);

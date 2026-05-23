@@ -741,7 +741,7 @@ nav{
     <li><a href="dashboard.html">DASHBOARD</a></li>
     <li><a href="activity.html" class="active">ACTIVITY</a></li>
     <li><a href="about.html">ABOUT</a></li>
-    <li><a href="logout">LOGOUT</a></li>
+    <li><a href="#" onclick="logout()">Logout</a></li>
   </ul>
   <div class="nav-right">
     <div class="nav-clock" id="clock">--:--:--</div>
@@ -1472,6 +1472,19 @@ function toggleMenu(){
   document.querySelector('.nav-links')
     .classList.toggle('show');
 }
+
+function logout() {
+
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  sessionStorage.clear();
+
+  alert('Logged out successfully');
+
+  window.location.href = 'login.html';
+}
 </script>
+
+
 </body>
 </html>
