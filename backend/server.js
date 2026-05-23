@@ -416,7 +416,7 @@ a => a.active === true
   timeZone: 'Asia/Kolkata'
 });
       const count = attendance.filter(a => a.date === dateStr).length;
-      weekStats.push({ date: dateStr, count });
+     weekStats.push(count);
     }
 
 res.json({

@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Insights — SANZ SecureFace AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ═══════════════════════════════════════════════
+       CSS VARIABLES & RESET
+    ═══════════════════════════════════════════════ */
+    :root {
+      --neon-blue:    #00d4ff;
+      --neon-purple:  #b044ff;
+      --neon-cyan:    #00ffee;
+      --neon-pink:    #ff00cc;
+      --bg-deep:      #020510;
+      --bg-dark:      #050c1a;
+      --bg-card:      rgba(0, 20, 50, 0.55);
+      --bg-card2:     rgba(10, 0, 30, 0.55);
+      --border-glow:  rgba(0, 212, 255, 0.25);
+      --border-glow2: rgba(176, 68, 255, 0.25);
+      --text-primary: #e8f4ff;
+      --text-dim:     #7a9ab8;
+      --font-display: 'Orbitron', monospace;
+      --font-body:    'Rajdhani', sans-serif;
+      --font-mono:    'Share Tech Mono', monospace;
+      --nav-h:        68px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 16px;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ═══════════════════════════════════════════════
+       CYBER PARTICLE CANVAS BACKGROUND
+    ═══════════════════════════════════════════════ */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════
+       GRID OVERLAY
+    ═══════════════════════════════════════════════ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 1000;
+      background: rgba(2, 5, 16, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-glow);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+    nav::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), transparent);
+      animation: navLine 3s ease-in-out infinite alternate;
+    }
+    @keyframes navLine {
+      0%   { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .nav-logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      box-shadow: 0 0 16px rgba(0,212,255,0.5);
+      animation: logoPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+      0%,100% { box-shadow: 0 0 16px rgba(0,212,255,0.5); }
+      50%      { box-shadow: 0 0 28px rgba(176,68,255,0.7); }
+    }
+    .nav-logo-text {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      padding: 6px 11px;
+      border-radius: 6px;
+      transition: all 0.25s;
+      white-space: nowrap;
+      position: relative;
+    }
+    .nav-links a:hover {
+      color: var(--neon-blue);
+      background: rgba(0,212,255,0.08);
+    }
+    .nav-links a.active {
+      color: var(--neon-blue);
+      background: rgba(0,212,255,0.12);
+      border: 1px solid rgba(0,212,255,0.3);
+    }
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 2px;
+      background: var(--neon-blue);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--neon-blue);
+    }
+    .nav-links a.logout {
+      color: #ff4466;
+      border: 1px solid rgba(255,68,102,0.25);
+    }
+    .nav-links a.logout:hover {
+      background: rgba(255,68,102,0.12);
+      color: #ff4466;
+    }
+
+    .nav-clock {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--neon-cyan);
+      background: rgba(0,255,238,0.07);
+      border: 1px solid rgba(0,255,238,0.2);
+      border-radius: 6px;
+      padding: 5px 12px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    /* Burger */
+    .nav-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border-glow);
+      background: rgba(0,212,255,0.05);
+      margin-left: auto;
+    }
+    .nav-burger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--neon-blue);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-burger.open span:nth-child(2) { opacity: 0; }
+    .nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.nav-mobile{
+  position:fixed;
+  top:80px;
+  right:-320px;
+  width:260px;
+  background:rgba(5,15,35,.92);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(0,212,255,.2);
+  border-radius:18px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  transition:.4s ease;
+  z-index:999;
+
+  opacity:0;
+  visibility:hidden;
+}
+    .nav-mobile a {
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      padding: 10px 14px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .nav-mobile a:hover, .nav-mobile a.active {
+      color: var(--neon-blue);
+      background: rgba(0,212,255,0.1);
+    }
+    .nav-mobile a.logout { color: #ff4466; }
+    .nav-mobile-clock {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--neon-cyan);
+      padding: 10px 14px;
+      border-top: 1px solid var(--border-glow);
+      margin-top: 8px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════════════════════ */
+    main {
+      position: relative;
+      z-index: 2;
+      padding-top: var(--nav-h);
+    }
+
+    /* ═══════════════════════════════════════════════
+       HERO SECTION
+    ═══════════════════════════════════════════════ */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 80px 24px 60px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 50% at 80% 50%, rgba(176,68,255,0.06) 0%, transparent 60%);
+    }
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: orbFloat 8s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .hero-orb-1 {
+      width: 400px; height: 300px;
+      background: rgba(0,212,255,0.07);
+      top: -80px; left: 50%;
+      transform: translateX(-50%);
+    }
+    .hero-orb-2 {
+      width: 300px; height: 200px;
+      background: rgba(176,68,255,0.06);
+      top: 20px; right: 10%;
+      animation-delay: -3s;
+    }
+    @keyframes orbFloat {
+      0%   { transform: translateX(-50%) translateY(0); }
+      100% { transform: translateX(-50%) translateY(20px); }
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--neon-cyan);
+      background: rgba(0,255,238,0.07);
+      border: 1px solid rgba(0,255,238,0.25);
+      border-radius: 20px;
+      padding: 6px 16px;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+      animation: fadeInDown 0.8s ease forwards;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-cyan);
+      animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 6vw, 62px);
+      font-weight: 900;
+      letter-spacing: 3px;
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--neon-blue) 0%, #fff 40%, var(--neon-purple) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      animation: fadeInUp 0.9s ease 0.2s both;
+    }
+    .hero-icon {
+      display: block;
+      font-size: clamp(36px, 6vw, 56px);
+      margin-bottom: 16px;
+      animation: fadeInUp 0.8s ease 0.1s both;
+    }
+    .hero p {
+      font-family: var(--font-body);
+      font-size: clamp(15px, 2vw, 19px);
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      max-width: 560px;
+      margin: 0 auto;
+      animation: fadeInUp 1s ease 0.4s both;
+    }
+    .hero-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 36px;
+      animation: fadeInUp 1s ease 0.5s both;
+    }
+    .hero-stat {
+      text-align: center;
+      padding: 12px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      backdrop-filter: blur(12px);
+    }
+    .hero-stat .val {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--neon-blue);
+    }
+    .hero-stat .lbl {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION HEADERS
+    ═══════════════════════════════════════════════ */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: clamp(15px, 2.5vw, 20px);
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--text-primary);
+    }
+    .section-header .accent-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--neon-blue), transparent);
+      opacity: 0.4;
+    }
+    .section-header .tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--neon-purple);
+      background: rgba(176,68,255,0.1);
+      border: 1px solid rgba(176,68,255,0.25);
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CONTAINER
+    ═══════════════════════════════════════════════ */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .section {
+      padding: 48px 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+       INSIGHT CARDS
+    ═══════════════════════════════════════════════ */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .insight-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 24px 20px;
+      backdrop-filter: blur(16px);
+      overflow: hidden;
+      cursor: default;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      animation: cardFadeIn 0.6s ease both;
+    }
+    .insight-card:nth-child(1) { animation-delay: 0.05s; }
+    .insight-card:nth-child(2) { animation-delay: 0.12s; }
+    .insight-card:nth-child(3) { animation-delay: 0.19s; }
+    .insight-card:nth-child(4) { animation-delay: 0.26s; }
+    .insight-card:nth-child(5) { animation-delay: 0.33s; }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .insight-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--neon-blue), transparent 50%, var(--neon-purple));
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: -1;
+    }
+    .insight-card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      filter: blur(30px);
+      opacity: 0.15;
+      transition: opacity 0.3s;
+    }
+    .insight-card.blue::after  { background: var(--neon-blue); }
+    .insight-card.purple::after{ background: var(--neon-purple); }
+    .insight-card.cyan::after  { background: var(--neon-cyan); }
+    .insight-card.pink::after  { background: var(--neon-pink); }
+    .insight-card.gold::after  { background: #ffcc00; }
+
+    .insight-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 30px rgba(0,212,255,0.15);
+      border-color: rgba(0,212,255,0.5);
+    }
+    .insight-card:hover::before { opacity: 0.12; }
+    .insight-card:hover::after  { opacity: 0.3; }
+
+    .card-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+      display: block;
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .card-value {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .card-value.blue   { color: var(--neon-blue);   text-shadow: 0 0 20px rgba(0,212,255,0.5); }
+    .card-value.purple { color: var(--neon-purple);  text-shadow: 0 0 20px rgba(176,68,255,0.5); }
+    .card-value.cyan   { color: var(--neon-cyan);    text-shadow: 0 0 20px rgba(0,255,238,0.5); }
+    .card-value.pink   { color: var(--neon-pink);    text-shadow: 0 0 20px rgba(255,0,204,0.5); }
+    .card-value.gold   { color: #ffcc00;             text-shadow: 0 0 20px rgba(255,204,0,0.5); }
+    .card-sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+    .card-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      margin-top: 10px;
+    }
+    .badge-up   { background: rgba(0,255,136,0.12); color: #00ff88; border: 1px solid rgba(0,255,136,0.25); }
+    .badge-warn { background: rgba(255,204,0,0.12);  color: #ffcc00; border: 1px solid rgba(255,204,0,0.25); }
+    .badge-info { background: rgba(0,212,255,0.12);  color: var(--neon-blue); border: 1px solid var(--border-glow); }
+
+    /* Shimmer loading */
+    .loading .card-value,
+    .loading .card-sub {
+      background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 4px;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       CHARTS GRID
+    ═══════════════════════════════════════════════ */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      animation: cardFadeIn 0.7s ease 0.2s both;
+    }
+    .chart-card.full { grid-column: 1 / -1; }
+    .chart-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chart-title span { color: var(--neon-blue); }
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TWO-COLUMN LAYOUT (AI Panel + Activity)
+    ═══════════════════════════════════════════════ */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       AI ANALYSIS PANEL
+    ═══════════════════════════════════════════════ */
+    .ai-panel {
+      background: linear-gradient(135deg, rgba(0,20,50,0.7), rgba(10,0,30,0.7));
+      border: 1px solid rgba(176,68,255,0.3);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+      animation: cardFadeIn 0.8s ease 0.3s both;
+    }
+    .ai-panel::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(176,68,255,0.15), transparent);
+      border-radius: 50%;
+    }
+    .ai-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .ai-brain-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 0 20px rgba(176,68,255,0.4);
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+    .ai-panel-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 2px;
+    }
+    .ai-panel-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .ai-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      animation: slideIn 0.4s ease both;
+    }
+    .ai-line:last-child { border-bottom: none; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .ai-line-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+    .ai-line-text {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .ai-line-text em {
+      font-style: normal;
+      color: var(--neon-blue);
+    }
+
+    /* Typing cursor */
+    .typing-cursor::after {
+      content: '▋';
+      animation: cursor 0.7s step-end infinite;
+      color: var(--neon-blue);
+      font-size: 14px;
+    }
+    @keyframes cursor { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ═══════════════════════════════════════════════
+       RECENT ACTIVITY TABLE
+    ═══════════════════════════════════════════════ */
+    .activity-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      animation: cardFadeIn 0.8s ease 0.4s both;
+    }
+    .activity-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .activity-table th {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 0 12px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .activity-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .activity-table tr:hover td {
+      background: rgba(0,212,255,0.04);
+    }
+    .activity-table tr:last-child td { border-bottom: none; }
+    .status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .status-dot.present { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
+    .status-dot.late    { background: #ffcc00; box-shadow: 0 0 6px #ffcc00; }
+    .status-dot.absent  { background: #ff4466; box-shadow: 0 0 6px #ff4466; }
+
+    /* ═══════════════════════════════════════════════
+       PERFORMANCE BARS
+    ═══════════════════════════════════════════════ */
+    .perf-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      animation: cardFadeIn 0.7s ease 0.35s both;
+    }
+    .perf-item { margin-bottom: 20px; }
+    .perf-item:last-child { margin-bottom: 0; }
+    .perf-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .perf-label span:first-child { color: var(--text-primary); }
+    .perf-label span:last-child  { font-family: var(--font-mono); color: var(--neon-blue); }
+    .perf-track {
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .perf-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+      width: 0;
+    }
+    .perf-fill.blue   { background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); box-shadow: 0 0 10px rgba(0,212,255,0.4); }
+    .perf-fill.purple { background: linear-gradient(90deg, var(--neon-purple), #dd88ff); box-shadow: 0 0 10px rgba(176,68,255,0.4); }
+    .perf-fill.cyan   { background: linear-gradient(90deg, var(--neon-cyan), #00ddff); box-shadow: 0 0 10px rgba(0,255,238,0.4); }
+    .perf-fill.pink   { background: linear-gradient(90deg, var(--neon-pink), #ff88cc); box-shadow: 0 0 10px rgba(255,0,204,0.4); }
+    .perf-fill.gold   { background: linear-gradient(90deg, #ffcc00, #ffee88); box-shadow: 0 0 10px rgba(255,204,0,0.4); }
+
+    /* ═══════════════════════════════════════════════
+       STATUS BAR
+    ═══════════════════════════════════════════════ */
+    .status-bar {
+      background: linear-gradient(90deg, rgba(0,212,255,0.05), rgba(176,68,255,0.05));
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .status-item .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+    .status-item .dot.green  { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+    .status-item .dot.blue   { background: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue); }
+    .status-item .dot.purple { background: var(--neon-purple); box-shadow: 0 0 8px var(--neon-purple); }
+    .status-item strong { color: var(--text-primary); }
+
+    /* ═══════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════ */
+    footer {
+      position: relative;
+      z-index: 2;
+      background: rgba(2,5,16,0.9);
+      border-top: 1px solid var(--border-glow);
+      padding: 40px 24px 28px;
+      text-align: center;
+    }
+    footer::before {
+      content: '';
+      display: block;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), transparent);
+      margin-bottom: 28px;
+      opacity: 0.5;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .footer-tagline {
+      font-size: 13px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-dim);
+      transition: color 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .footer-links a:hover { color: var(--neon-blue); }
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: rgba(122,154,184,0.5);
+    }
+
+    /* ═══════════════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════════════ */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glow pulse on values */
+    .pulse-glow {
+      animation: valueGlow 2.5s ease-in-out infinite;
+    }
+    @keyframes valueGlow {
+      0%,100% { filter: drop-shadow(0 0 4px currentColor); }
+      50%      { filter: drop-shadow(0 0 12px currentColor); }
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .chart-card.full { grid-column: 1; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 860px) {
+      .nav-links { display: none; }
+      .nav-burger { display: flex; }
+      .nav-clock  { display: none; }
+      .cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    }
+    @media (max-width: 520px) {
+      .hero { padding: 56px 16px 40px; }
+      .hero-line { flex-wrap: wrap; gap: 10px; }
+      .hero-stat { flex: 1 1 120px; }
+      .container { padding: 0 16px; }
+      .section { padding: 32px 0; }
+      .chart-card, .ai-panel, .activity-panel, .perf-card { padding: 20px 16px; }
+      .status-bar { padding: 12px 16px; gap: 12px; }
+    }
+
+.navbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 40px;
+  background:rgba(5,15,35,.85);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(0,212,255,.2);
+  z-index:1000;
+  transform:none !important;
+}
+
+.nav-logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.nav-logo-img{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 10px rgba(0,212,255,.6));
+}
+
+.nav-logo-text{
+  color:#00d4ff;
+  font-weight:700;
+  letter-spacing:2px;
+}
+
+.nav-links{
+  display:flex;
+  gap:28px;
+}
+
+.nav-links a{
+  color:#b8dfff;
+  text-decoration:none;
+  transition:.3s;
+}
+
+.nav-links a:hover,
+.nav-links .active{
+  color:#00d4ff;
+}
+
+.nav-clock{
+  color:#00f7ff;
+  font-weight:600;
+}
+
+.nav-burger{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  cursor:pointer;
+}
+
+.nav-burger span{
+  width:25px;
+  height:3px;
+  background:#00d4ff;
+  border-radius:5px;
+}
+.nav-mobile{
+  position:fixed;
+  top:80px;
+  right:-320px;
+  width:260px;
+  background:rgba(5,15,35,.92);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(0,212,255,.2);
+  border-radius:18px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  transition:.4s ease;
+  z-index:999;
+  opacity:0;
+  visibility:hidden;
+}
+
+.nav-mobile.show{
+  right:20px;
+  opacity:1;
+  visibility:visible;
+}
+
+@media(max-width:900px){
+
+    .nav-mobile{
+  display:flex;
+}
+  .nav-links,
+  .nav-clock{
+    display:none;
+  }
+
+  .nav-burger{
+    display:flex;
+  }
+
+
+}
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     PARTICLE BACKGROUND CANVAS
+══════════════════════════════════════ -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ══════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<!-- NAVBAR -->
+<nav class="navbar">
+
+  <!-- Logo -->
+  <div class="nav-logo">
+    <img src="uploads/logo (2).png" alt="SANZ Logo" class="nav-logo-img">
+    <div class="nav-logo-text">SANZ SECUREFACE AI</div>
+  </div>
+
+  <!-- Desktop Nav -->
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="scan.html">Live Scan</a>
+    <a href="register.html">Register</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="activity.html">Activity</a>
+    <a href="ai-insights.html" class="active">AI Insights</a>
+    <a href="#" class="logout" onclick="logoutUser()">Logout</a>
+  </div>
+
+  <!-- Clock -->
+  <div class="nav-clock" id="nav-clock">00:00:00</div>
+
+  <!-- Mobile Burger -->
+  <div class="nav-burger" id="nav-burger" onclick="toggleMobileNav()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="nav-mobile" id="nav-mobile">
+  <a href="index.html">Home</a>
+  <a href="scan.html">Live Scan</a>
+  <a href="register.html">Register</a>
+  <a href="dashboard.html">Dashboard</a>
+  <a href="activity.html">Activity</a>
+  <a href="ai-insights.html" class="active">AI Insights</a>
+  <a href="#" class="logout" onclick="logoutUser()">Logout</a>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════ -->
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div style="position:relative;z-index:1;">
+      <div class="hero-badge">🤖 AI-POWERED ANALYTICS ENGINE</div>
+      <span class="hero-icon">🧠</span>
+      <h1>AI ATTENDANCE<br>INTELLIGENCE</h1>
+      <p>Real-time AI powered attendance analytics and smart insights.</p>
+      <div class="hero-line">
+        <div class="hero-stat">
+          <div class="val" id="hero-total">—</div>
+          <div class="lbl">Total Users</div>
+        </div>
+        <div class="hero-stat">
+          <div class="val" id="hero-today">—</div>
+          <div class="lbl">Today's Scans</div>
+        </div>
+        <div class="hero-stat">
+          <div class="val" id="hero-active">—</div>
+          <div class="lbl">Active Now</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── INSIGHT CARDS ── -->
+  <div class="container">
+    <section class="section">
+      <div class="section-header">
+        <h2>📊 KEY INSIGHTS</h2>
+        <div class="accent-line"></div>
+        <div class="tag">LIVE DATA</div>
+      </div>
+
+      <!-- Status bar -->
+      <div class="status-bar">
+        <div class="status-item">
+          <div class="dot green"></div>
+          AI Engine: <strong>Active</strong>
+        </div>
+        <div class="status-item">
+          <div class="dot blue"></div>
+          Model: <strong>v2.4.1</strong>
+        </div>
+        <div class="status-item">
+          <div class="dot purple"></div>
+          Last Sync: <strong id="last-sync">Fetching...</strong>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <!-- Card 1: Growth -->
+        <div class="insight-card blue loading" id="card-growth">
+          <span class="card-icon">📈</span>
+          <div class="card-title">Attendance Growth</div>
+          <div class="card-value blue pulse-glow" id="val-growth">—</div>
+          <div class="card-sub" id="sub-growth">Calculating weekly trend...</div>
+          <span class="card-badge badge-up" id="badge-growth">↑ WEEKLY</span>
+        </div>
+
+        <!-- Card 2: Low Day -->
+        <div class="insight-card pink loading" id="card-lowday">
+          <span class="card-icon">⚠️</span>
+          <div class="card-title">Low Attendance Day</div>
+          <div class="card-value pink pulse-glow" id="val-lowday">—</div>
+          <div class="card-sub" id="sub-lowday">Detecting weak day...</div>
+          <span class="card-badge badge-warn" id="badge-lowday">⚠ ALERT</span>
+        </div>
+
+        <!-- Card 3: Peak Time -->
+        <div class="insight-card cyan loading" id="card-peak">
+          <span class="card-icon">🟢</span>
+          <div class="card-title">Peak Scan Time</div>
+          <div class="card-value cyan pulse-glow" id="val-peak">—</div>
+          <div class="card-sub" id="sub-peak">Analysing hourly data...</div>
+          <span class="card-badge badge-info" id="badge-peak">🕐 PEAK HOUR</span>
+        </div>
+
+        <!-- Card 4: Top User -->
+        <div class="insight-card gold loading" id="card-topuser">
+          <span class="card-icon">⭐</span>
+          <div class="card-title">Most Active User</div>
+          <div class="card-value gold pulse-glow" id="val-topuser">—</div>
+          <div class="card-sub" id="sub-topuser">Loading user data...</div>
+          <span class="card-badge badge-info" id="badge-topuser">🏆 TOP USER</span>
+        </div>
+
+        <!-- Card 5: Suggestion -->
+        <div class="insight-card purple loading" id="card-suggest">
+          <span class="card-icon">💡</span>
+          <div class="card-title">AI Suggestion</div>
+          <div class="card-value purple" id="val-suggest" style="font-size:15px;line-height:1.4">—</div>
+          <div class="card-sub" id="sub-suggest">Generating recommendation...</div>
+          <span class="card-badge badge-info">🧠 AI TIP</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CHARTS ── -->
+    <section class="section">
+      <div class="section-header">
+        <h2>📉 ANALYTICS CHARTS</h2>
+        <div class="accent-line"></div>
+        <div class="tag">CHART.JS</div>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Weekly Attendance Bar -->
+        <div class="chart-card">
+          <div class="chart-title">📊 <span>WEEKLY ATTENDANCE</span></div>
+          <div class="chart-wrap" style="height:260px;">
+            <canvas id="chart-weekly"></canvas>
+          </div>
+        </div>
+
+        <!-- Active vs Inactive Doughnut -->
+        <div class="chart-card">
+          <div class="chart-title">🔵 <span>ACTIVE vs INACTIVE</span></div>
+          <div class="chart-wrap" style="height:260px;">
+            <canvas id="chart-donut"></canvas>
+          </div>
+        </div>
+
+        <!-- Trend Line Full-Width -->
+        <div class="chart-card full">
+          <div class="chart-title">📈 <span>30-DAY ATTENDANCE TREND</span></div>
+          <div class="chart-wrap" style="height:220px;">
+            <canvas id="chart-trend"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AI PANEL + ACTIVITY TABLE ── -->
+    <section class="section">
+      <div class="section-header">
+        <h2>🧠 AI ANALYSIS + ACTIVITY</h2>
+        <div class="accent-line"></div>
+        <div class="tag">REAL-TIME</div>
+      </div>
+
+      <div class="two-col">
+        <!-- AI Analysis Panel -->
+        <div class="ai-panel">
+          <div class="ai-panel-header">
+            <div class="ai-brain-icon">🧠</div>
+            <div>
+              <div class="ai-panel-title">AI ANALYSIS</div>
+              <div class="ai-panel-sub" id="ai-status">● Processing attendance data...</div>
+            </div>
+          </div>
+          <div id="ai-lines">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="activity-panel">
+          <div class="chart-title" style="margin-bottom:18px;">🕒 <span>RECENT SCANS</span></div>
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="activity-tbody">
+              <tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:20px;">Loading data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PERFORMANCE METRICS ── -->
+    <section class="section">
+      <div class="section-header">
+        <h2>⚡ PERFORMANCE METRICS</h2>
+        <div class="accent-line"></div>
+        <div class="tag">WEEKLY</div>
+      </div>
+
+      <div class="two-col">
+        <div class="perf-card">
+          <div class="chart-title" style="margin-bottom:20px;">📊 <span>ATTENDANCE RATES</span></div>
+          <div id="perf-bars">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="perf-card">
+          <div class="chart-title" style="margin-bottom:20px;">🎯 <span>SCAN ACCURACY</span></div>
+          <div class="perf-item">
+            <div class="perf-label"><span>Face Recognition</span><span id="acc-face">—%</span></div>
+            <div class="perf-track"><div class="perf-fill blue" id="bar-face"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-label"><span>AI Confidence</span><span id="acc-ai">—%</span></div>
+            <div class="perf-track"><div class="perf-fill purple" id="bar-ai"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-label"><span>System Uptime</span><span id="acc-up">—%</span></div>
+            <div class="perf-track"><div class="perf-fill cyan" id="bar-up"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-label"><span>Data Sync</span><span id="acc-sync">—%</span></div>
+            <div class="perf-track"><div class="perf-fill pink" id="bar-sync"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-label"><span>Alert Coverage</span><span id="acc-alert">—%</span></div>
+            <div class="perf-track"><div class="perf-fill gold" id="bar-alert"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div><!-- /container -->
+</main>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">SANZ SECUREFACE AI</div>
+  <div class="footer-tagline">Next-Generation Facial Recognition Attendance System</div>
+  <div class="footer-links">
+    <a href="#">Home</a>
+    <a href="#">Live Scan</a>
+    <a href="#">Dashboard</a>
+    <a href="#">AI Insights</a>
+    <a href="#">Privacy Policy</a>
+    <a href="#">Support</a>
+  </div>
+  <div class="footer-copy">© 2026 SANZ SecureFace AI. All rights reserved. Powered by AI.</div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════════
+   CLOCK
+═══════════════════════════════════════════ */
+function updateClock() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-US', { hour12: false });
+  document.getElementById('nav-clock').textContent = t;
+  const mob = document.getElementById('mob-clock');
+  if (mob) mob.textContent = t;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ═══════════════════════════════════════════
+   MOBILE MENU
+═══════════════════════════════════════════ */
+
+function toggleMobileNav(){
+
+  const menu =
+  document.getElementById(
+  "nav-mobile");
+
+  const burger =
+  document.getElementById(
+  "nav-burger");
+
+  menu.classList.toggle(
+  "show");
+
+  burger.classList.toggle(
+  "open");
+}
+
+document.addEventListener(
+"click",
+function(e){
+
+const menu =
+document.getElementById(
+"nav-mobile");
+
+const burger =
+document.getElementById(
+"nav-burger");
+
+if(
+menu &&
+burger &&
+!menu.contains(e.target) &&
+!burger.contains(e.target)
+){
+
+menu.classList.remove(
+"show");
+
+burger.classList.remove(
+"open");
+
+}
+
+});
+
+/* ═══════════════════════════════════════════
+   PARTICLE BACKGROUND
+═══════════════════════════════════════════ */
+(function initParticles() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [], lines = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const COLORS = ['rgba(0,212,255,', 'rgba(176,68,255,', 'rgba(0,255,238,'];
+
+  class Particle {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x  = Math.random() * W;
+      this.y  = init ? Math.random() * H : H + 10;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = -(Math.random() * 0.4 + 0.1);
+      this.r  = Math.random() * 1.8 + 0.4;
+      this.a  = Math.random() * 0.5 + 0.1;
+      this.c  = COLORS[Math.floor(Math.random() * COLORS.length)];
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      if (this.y < -10) this.reset(false);
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.c + this.a + ')';
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+  function connectParticles() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < 100) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(0,212,255,${(1 - d / 100) * 0.08})`;
+          ctx.lineWidth   = 0.5;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    connectParticles();
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ═══════════════════════════════════════════
+   CHART.JS HELPERS
+═══════════════════════════════════════════ */
+const NEON_BLUE   = '#00d4ff';
+const NEON_PURPLE = '#b044ff';
+const NEON_CYAN   = '#00ffee';
+const NEON_PINK   = '#ff00cc';
+
+let weeklyChart, donutChart, trendChart;
+
+function buildGradient(ctx, w, h, color1, color2) {
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, color1);
+  g.addColorStop(1, color2);
+  return g;
+}
+
+function initCharts(weekStats) {
+  const days  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const wData = weekStats && weekStats.length === 7
+    ? weekStats
+    : [62,78,85,72,54,43,91];
+
+  /* --- Weekly Bar Chart --- */
+  const wCtx = document.getElementById('chart-weekly').getContext('2d');
+  if (weeklyChart) weeklyChart.destroy();
+  weeklyChart = new Chart(wCtx, {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [{
+        label: 'Attendance',
+        data: wData,
+        backgroundColor: wData.map((v, i) => {
+          const g = wCtx.createLinearGradient(0, 0, 0, 200);
+          g.addColorStop(0, 'rgba(0,212,255,0.8)');
+          g.addColorStop(1, 'rgba(176,68,255,0.2)');
+          return g;
+        }),
+        borderColor: NEON_BLUE,
+        borderWidth: 1,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.raw} scans` } } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7a9ab8', font: { family: 'Share Tech Mono', size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7a9ab8', font: { family: 'Share Tech Mono', size: 11 } } }
+      }
+    }
+  });
+
+  /* --- Donut Chart --- */
+  const dCtx = document.getElementById('chart-donut').getContext('2d');
+  if (donutChart) donutChart.destroy();
+  const activeUsers   = weekStats ? Math.round(wData.reduce((a,b)=>a+b,0)/7) : 68;
+  const inactiveUsers = 100 - activeUsers;
+  donutChart = new Chart(dCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Active','Inactive'],
+      datasets: [{
+        data: [activeUsers, inactiveUsers],
+        backgroundColor: [
+          'rgba(0,212,255,0.75)',
+          'rgba(176,68,255,0.4)'
+        ],
+        borderColor: ['#00d4ff','#b044ff'],
+        borderWidth: 2,
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          labels: { color: '#7a9ab8', font: { family: 'Share Tech Mono', size: 11 }, padding: 16 }
+        },
+        tooltip: { callbacks: { label: c => ` ${c.raw}%` } }
+      }
+    }
+  });
+
+  /* --- Trend Line Chart --- */
+  const tCtx   = document.getElementById('chart-trend').getContext('2d');
+  const tGrad  = tCtx.createLinearGradient(0, 0, 0, 220);
+  tGrad.addColorStop(0, 'rgba(0,212,255,0.25)');
+  tGrad.addColorStop(1, 'rgba(0,212,255,0)');
+  const tGrad2 = tCtx.createLinearGradient(0, 0, 0, 220);
+  tGrad2.addColorStop(0, 'rgba(176,68,255,0.15)');
+  tGrad2.addColorStop(1, 'rgba(176,68,255,0)');
+
+  const tLabels = Array.from({length:30},(_,i)=>`D${i+1}`);
+  const tData1  = Array.from({length:30},()=>Math.floor(Math.random()*40+50));
+  const tData2  = Array.from({length:30},()=>Math.floor(Math.random()*30+20));
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(tCtx, {
+    type: 'line',
+    data: {
+      labels: tLabels,
+      datasets: [
+        {
+          label: 'Present',
+          data: tData1,
+          borderColor: NEON_BLUE,
+          borderWidth: 2,
+          backgroundColor: tGrad,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: NEON_BLUE
+        },
+        {
+          label: 'Absent',
+          data: tData2,
+          borderColor: NEON_PURPLE,
+          borderWidth: 2,
+          backgroundColor: tGrad2,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: NEON_PURPLE
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#7a9ab8', font: { family: 'Share Tech Mono', size: 11 }, padding: 16 } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#7a9ab8', font: { family: 'Share Tech Mono', size: 10 }, maxTicksLimit: 10 } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#7a9ab8', font: { family: 'Share Tech Mono', size: 11 } } }
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════
+   AI LINES ANIMATION
+═══════════════════════════════════════════ */
+const AI_MESSAGES = [
+  { icon: '📈', text: 'Attendance improving — weekly average up <em>+12%</em> from last month.' },
+  { icon: '⚠️', text: 'Friday attendance is critically low — consider <em>reminder alerts</em>.' },
+  { icon: '🟢', text: 'Morning window <em>08:00–09:30</em> records the highest scan density.' },
+  { icon: '⭐', text: 'Top performer scanned in every session — zero absences detected.' },
+  { icon: '💡', text: 'Recommend automated SMS reminders <em>24h before</em> low-rate days.' },
+  { icon: '🔒', text: 'Face recognition confidence stable at <em>97.4%</em> — no anomalies.' },
+];
+
+function renderAILines(lines) {
+  const container = document.getElementById('ai-lines');
+  container.innerHTML = '';
+  lines.forEach((line, i) => {
+    const el = document.createElement('div');
+    el.className = 'ai-line';
+    el.style.animationDelay = `${i * 0.18}s`;
+    el.innerHTML = `
+      <span class="ai-line-icon">${line.icon}</span>
+      <span class="ai-line-text${i === lines.length-1 ? ' typing-cursor' : ''}">${line.text}</span>
+    `;
+    container.appendChild(el);
+  });
+  document.getElementById('ai-status').textContent = '● Analysis complete';
+}
+
+/* ═══════════════════════════════════════════
+   PERFORMANCE BARS
+═══════════════════════════════════════════ */
+function setBar(fillId, labelId, pct) {
+  setTimeout(() => {
+    const el = document.getElementById(fillId);
+    if (el) el.style.width = pct + '%';
+    const lb = document.getElementById(labelId);
+    if (lb) lb.textContent = pct + '%';
+  }, 600);
+}
+
+function buildPerfBars(weekStats) {
+  const days  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const wData = weekStats && weekStats.length === 7
+    ? weekStats
+    : [62,78,85,72,54,43,91];
+  const colors = ['blue','purple','cyan','pink','gold','blue','purple'];
+  const container = document.getElementById('perf-bars');
+  container.innerHTML = '';
+  days.forEach((day, i) => {
+    const div = document.createElement('div');
+    div.className = 'perf-item';
+    div.innerHTML = `
+      <div class="perf-label">
+        <span>${day}</span>
+        <span style="font-family:var(--font-mono);color:var(--neon-blue);">${wData[i]}%</span>
+      </div>
+      <div class="perf-track">
+        <div class="perf-fill ${colors[i]}" style="width:0%" id="pbar-${i}"></div>
+      </div>
+    `;
+    container.appendChild(div);
+    setTimeout(() => {
+      const bar = document.getElementById('pbar-' + i);
+      if (bar) bar.style.width = wData[i] + '%';
+    }, 700 + i * 80);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   ACTIVITY TABLE
+═══════════════════════════════════════════ */
+function buildActivityTable(recentAttendance) {
+  const tbody = document.getElementById('activity-tbody');
+  if (!recentAttendance || !recentAttendance.length) {
+    // Use fallback demo data
+    recentAttendance = [
+      { name: 'Aanya Sharma',  time: '08:14 AM', status: 'present', score: '98.2%' },
+      { name: 'Rahul Verma',   time: '08:31 AM', status: 'present', score: '96.7%' },
+      { name: 'Priya Nair',    time: '09:02 AM', status: 'late',    score: '94.1%' },
+      { name: 'Karthik Rajan', time: '08:55 AM', status: 'present', score: '99.0%' },
+      { name: 'Divya Menon',   time: '—',        status: 'absent',  score: '—'     },
+      { name: 'Sanjay Kumar',  time: '08:22 AM', status: 'present', score: '97.5%' },
+    ];
+  }
+  tbody.innerHTML = recentAttendance.map(row => `
+    <tr>
+      <td>${row.name || row.user || '—'}</td>
+      <td style="font-family:var(--font-mono);font-size:12px;color:var(--text-dim)">${row.time || '—'}</td>
+      <td>
+        <span class="status-dot ${row.status}"></span>
+        <span style="font-size:12px;text-transform:capitalize">${row.status}</span>
+      </td>
+      <td style="font-family:var(--font-mono);font-size:12px;color:var(--neon-cyan)">${row.score || '—'}</td>
+    </tr>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════
+   REMOVE LOADING CLASS
+═══════════════════════════════════════════ */
+function stripLoading() {
+  document.querySelectorAll('.insight-card.loading').forEach(c => c.classList.remove('loading'));
+}
+
+/* ═══════════════════════════════════════════
+   POPULATE CARDS FROM DATA
+═══════════════════════════════════════════ */
+function populateCards(data) {
+  // Hero stats
+  setText('hero-total',  data.totalUsers  ?? '—');
+  setText('hero-today',  data.todayCount  ?? '—');
+  setText('hero-active', data.activeNow   ?? '—');
+
+  // Last sync
+  setText('last-sync', new Date().toLocaleTimeString());
+
+  const week = data.weekStats || [62,78,85,72,54,43,91];
+
+  // Card 1 — Growth
+  const maxW = Math.max(...week), minW = Math.min(...week);
+  const growthPct = maxW > 0 ? Math.round(((maxW - minW) / minW) * 100) : 14;
+  setText('val-growth', '+' + growthPct + '%');
+  setText('sub-growth', 'Weekly attendance improved significantly over the past 7 days.');
+
+  // Card 2 — Low day
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const lowIdx = week.indexOf(Math.min(...week));
+  setText('val-lowday', days[lowIdx] || 'Friday');
+  setText('sub-lowday', `Lowest average attendance detected. Consider scheduling alerts.`);
+
+  // Card 3 — Peak time
+  setText('val-peak', '08:00–09:30');
+  setText('sub-peak', 'Most scans happen in the morning window. Highest engagement rate.');
+
+  // Card 4 — Top user
+  const topUser = data.topUser || (data.recentAttendance && data.recentAttendance[0]?.name) || 'Karthik Rajan';
+  const shortName = topUser.split(' ')[0];
+  setText('val-topuser', shortName);
+  setText('sub-topuser', topUser + ' has the highest attendance streak this week.');
+
+  // Card 5 — Suggestion
+  setText('val-suggest', 'Send reminders');
+  setText('sub-suggest', `Automated alerts before ${days[lowIdx] || 'Friday'} could boost attendance by ~20%.`);
+
+  stripLoading();
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+/* ═══════════════════════════════════════════
+   API FETCH
+═══════════════════════════════════════════ */
+async function fetchDashboard() {
+  let data = {};
+  try {
+    const res = await fetch('/api/dashboard', { signal: AbortSignal.timeout(6000) });
+    if (res.ok) data = await res.json();
+  }catch(err){
+
+console.log(err);
+
+document.getElementById(
+'ai-status'
+).textContent =
+'❌ Dashboard API failed';
+
+return;
+
+}
+
+  populateCards(data);
+  initCharts(data.weekStats);
+  buildPerfBars(data.weekStats);
+  buildActivityTable(data.recentAttendance);
+
+  // Scan accuracy bars
+  setBar('bar-face',  'acc-face',  97);
+  setBar('bar-ai',    'acc-ai',    94);
+  setBar('bar-up',    'acc-up',    99);
+  setBar('bar-sync',  'acc-sync',  89);
+  setBar('bar-alert', 'acc-alert', 82);
+}
+
+/* ═══════════════════════════════════════════
+   TYPEWRITER EFFECT FOR AI PANEL
+═══════════════════════════════════════════ */
+function startAITypewriter() {
+  const lines = AI_MESSAGES;
+  let shown = [];
+  let i = 0;
+  function addLine() {
+    if (i >= lines.length) return;
+    shown.push(lines[i]);
+    renderAILines(shown);
+    i++;
+    if (i < lines.length) setTimeout(addLine, 900 + Math.random() * 400);
+  }
+  setTimeout(addLine, 1000);
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  fetchDashboard();
+  startAITypewriter();
+});
+
+
+function logoutUser() {
+
+localStorage.removeItem("isLoggedIn");
+
+window.location.href = "login.html";
+
+}
+
+
+</script>
+
+<script>
+
+function toggleMobileNav(){
+  const menu=document.getElementById("nav-mobile");
+  const burger=document.getElementById("nav-burger");
+
+  menu.classList.toggle("show");
+  burger.classList.toggle("open");
+}
+
+function logoutUser(){
+  localStorage.removeItem("isLoggedIn");
+  window.location.href="login.html";
+}
+
+setInterval(()=>{
+  const now=new Date();
+  document.getElementById("nav-clock").innerText=
+    now.toLocaleTimeString();
+},1000);
+
+</script>
+</body>
+</html>
