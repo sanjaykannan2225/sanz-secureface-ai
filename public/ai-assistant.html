@@ -94,8 +94,24 @@ nav{position:relative;z-index:100;display:flex;align-items:center;gap:1rem;paddi
 .nav-clock{flex-shrink:0;font-size:.75rem;font-weight:600;color:var(--blue);letter-spacing:.1em;text-shadow:0 0 12px var(--blue);font-variant-numeric:tabular-nums;white-space:nowrap}
 .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;border:none;background:none}
 .burger span{display:block;width:22px;height:2px;background:var(--blue);border-radius:2px;transition:.3s}
-.mobile-menu{display:none;position:fixed;top:61px;left:0;right:0;z-index:99;background:rgba(2,8,24,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:1rem;flex-direction:column;gap:.25rem}
-.mobile-menu.open{display:flex}
+.mobile-menu{
+display:none;
+position:fixed;
+top:70px;
+left:0;
+width:100%;
+z-index:9999;
+background:rgba(2,8,24,0.98);
+backdrop-filter:blur(20px);
+border-bottom:1px solid var(--border);
+padding:1rem;
+flex-direction:column;
+gap:.4rem;
+}
+
+.mobile-menu.open{
+display:flex !important;
+}
 .mobile-menu a{color:var(--muted);text-decoration:none;padding:.5rem .75rem;border-radius:6px;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;transition:.2s}
 .mobile-menu a:hover,.mobile-menu a.active{color:var(--blue);background:var(--glow-blue)}
 
@@ -199,24 +215,137 @@ nav{position:relative;z-index:100;display:flex;align-items:center;gap:1rem;paddi
   .nav-links a{font-size:.64rem;padding:.3rem .45rem}
 }
 @media(max-width:768px){
+
+.chat-header{
+padding:.45rem .55rem;
+gap:.3rem;
+flex-wrap:wrap;
+overflow:visible;
+}
+
+.chat-header-avatar{
+width:34px;
+height:34px;
+}
+
+.chat-header-info h2{
+font-size:.78rem;
+white-space:nowrap;
+}
+.chat-header-info{
+min-width:0;
+flex:1;
+}
+
+.chat-header-info p{
+font-size:.58rem;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.chat-actions{
+display:flex;
+gap:.12rem;
+flex-wrap:nowrap;
+}
+
+.chat-btn-sm{
+padding:.18rem .28rem;
+font-size:.46rem;
+white-space:nowrap;
+}
+
+.chat-online{
+font-size:.55rem;
+gap:.2rem;
+}
+
+.chat-header{
+overflow:hidden;
+}
+
+.sidebar{
+display:none;
+}
+
+.sidebar.show{
+display:flex;
+position:fixed;
+top:70px;
+left:0;
+width:85%;
+height:calc(100vh - 70px);
+z-index:9999;
+background:#020818;
+overflow-y:auto;
+border-right:1px solid var(--border);
+padding:.75rem;
+}
+
   nav{padding:.65rem 1rem}
   .nav-links{display:none}
   .nav-clock{display:none}
-  .burger{display:flex}
-  .main{flex-direction:column;overflow-y:auto}
-  .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-shrink:0;overflow-y:visible}
-  .chat-panel{flex:1;min-height:500px}
+  .nav-burger{
+  display:flex !important;
+}
+  .main{
+flex-direction:column;
+overflow:hidden;
+}
+ 
+.chat-panel{
+flex:1;
+height:100vh;
+}
   .features-grid{grid-template-columns:repeat(5,1fr)}
   .feat-icon{font-size:.9rem}
   .feat-label{font-size:.58rem}
+  .navbar{
+  justify-content:space-between;
+}
+
+.nav-brand{
+  flex:1;
+}
+
+
+.messages{
+min-height:60vh;
+}
 }
 @media(max-width:480px){
   .features-grid{grid-template-columns:1fr 1fr}
-  .msg-bubble{max-width:88%}
+.msg-bubble{
+max-width:95%;
+font-size:.82rem;
+}
   .chat-header{padding:.6rem .9rem}
   .messages{padding:.75rem .9rem}
   .input-area{padding:.65rem .9rem}
 }
+
+.navbar{
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+.input-area{
+position:sticky;
+bottom:0;
+z-index:20;
+}
+.ai-logo,
+.chat-logo,
+.msg-logo{
+width:100%;
+height:100%;
+object-fit:contain;
+border-radius:50%;
+}
+
+
 </style>
 </head>
 <body>
@@ -322,6 +451,14 @@ id="navClock">
   <a href="user-guide.html">USER GUIDE</a>
 
   <a href="#"
+onclick="
+document.querySelector('.sidebar').classList.toggle('show');
+document.getElementById('mobileMenu').classList.remove('open');
+">
+AI MENU
+</a>
+
+  <a href="#"
      onclick="logout()">
      LOGOUT
   </a>
@@ -336,7 +473,9 @@ id="navClock">
 
     <!-- AI Profile -->
     <div class="profile-card">
-      <div class="ai-avatar">🤖</div>
+     <div class="ai-avatar">
+  <img src="uploads/logo3.png" class="ai-logo">
+</div>
       <div class="profile-name"><span>SANZ Smart AI</span> Assistant</div>
       <div class="status-dot">Online</div>
       <div class="profile-desc">Your intelligent AI assistant for coding, attendance, reports, guidance and technical help.</div>
@@ -370,7 +509,9 @@ id="navClock">
 
     <!-- Chat Header -->
     <div class="chat-header">
-      <div class="chat-header-avatar">🤖</div>
+     <div class="chat-header-avatar">
+  <img src="uploads/logo3.png" class="chat-logo">
+</div>
       <div class="chat-header-info">
         <h2>SANZ Smart AI</h2>
         <p>Advanced AI Assistant · Powered by Neural Intelligence</p>
@@ -389,8 +530,10 @@ class="chat-btn-sm">
 
     <!-- Messages -->
     <div class="messages" id="messages">
-      <div class="msg ai">
-        <div class="msg-avatar">🤖</div>
+<div class="msg ai">
+  <div class="msg-avatar">
+    <img src="uploads/logo3.png" class="msg-logo">
+  </div>
         <div class="msg-bubble">
           <div class="welcome-card">
             <h3>Hello 👋 I'm SANZ Smart AI</h3>
@@ -443,9 +586,6 @@ updateClock();
 setInterval(updateClock,1000);
 
 /* ── BURGER ── */
-document.getElementById('burgerBtn').addEventListener('click',function(){
-  document.getElementById('mobileMenu').classList.toggle('open');
-});
 
 /* ── PARTICLES ── */
 (function(){
@@ -507,7 +647,12 @@ function appendMsg(role,content,isHtml=false){
   wrap.className='msg '+role;
   const avatar=document.createElement('div');
   avatar.className='msg-avatar';
-  avatar.textContent=role==='ai'?'🤖':'👤';
+if(role==='ai'){
+avatar.innerHTML=
+'<img src="uploads/logo3.png" class="msg-logo">';
+}else{
+avatar.textContent='👤';
+}
   const bubble=document.createElement('div');
   bubble.className='msg-bubble';
   if(isHtml)bubble.innerHTML=content;
@@ -525,7 +670,8 @@ function appendTyping(){
   wrap.id='typingIndicator';
   const avatar=document.createElement('div');
   avatar.className='msg-avatar';
-  avatar.textContent='🤖';
+avatar.innerHTML=
+'<img src="uploads/logo3.png" class="msg-logo">';
   const bubble=document.createElement('div');
   bubble.className='msg-bubble';
   bubble.innerHTML='<div class="typing-indicator"><span></span><span></span><span></span></div><span style="font-size:.72rem;color:var(--muted);margin-left:.4rem">SANZ AI is thinking...</span>';
@@ -582,7 +728,9 @@ async function sendMessage(){
     const errBubble=document.createElement('div');
     errBubble.className='msg ai';
     errBubble.innerHTML=`
-      <div class="msg-avatar">🤖</div>
+     <div class="msg-avatar">
+  <img src="uploads/logo3.png" class="msg-logo">
+</div>
       <div class="msg-bubble">
         <div class="error-card">⚠ SANZ AI temporarily unavailable.<br><span style="font-size:.7rem;opacity:.7">Please check your connection and try again.</span></div>
       </div>`;

@@ -212,22 +212,28 @@
 
 .nav-mobile{
   position:fixed;
-  top:80px;
+  top:72px;
   right:-320px;
-  width:260px;
-  background:rgba(5,15,35,.92);
-  backdrop-filter:blur(18px);
-  border:1px solid rgba(0,212,255,.2);
+  width:280px;
+  max-width:85%;
+  background:rgba(5,15,35,.96);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(0,212,255,.25);
   border-radius:18px;
-  padding:20px;
+  padding:22px;
   display:flex;
   flex-direction:column;
-  gap:18px;
-  transition:.4s ease;
-  z-index:999;
-
+  gap:12px;
+  transition:.35s ease;
+  z-index:99999;
   opacity:0;
   visibility:hidden;
+}
+
+.nav-mobile.show{
+  right:15px;
+  opacity:1;
+  visibility:visible;
 }
     .nav-mobile a {
       font-family: var(--font-body);
@@ -1037,7 +1043,7 @@
     <a href="dashboard.html">Dashboard</a>
     <a href="activity.html">Activity</a>
     <a href="ai-insights.html" class="active">AI Insights</a>
-    <li><a href="ai-assistant.html">AI ASSISTANT</a></li>
+   <a href="ai-assistant.html">AI ASSISTANT</a>
     <a href="#" class="logout" onclick="logoutUser()">Logout</a>
   </div>
 
@@ -1061,7 +1067,7 @@
   <a href="dashboard.html">Dashboard</a>
   <a href="activity.html">Activity</a>
   <a href="ai-insights.html" class="active">AI Insights</a>
-  <li><a href="ai-assistant.html">AI ASSISTANT</a></li>
+<a href="ai-assistant.html">AI ASSISTANT</a>
   <a href="#" class="logout" onclick="logoutUser()">Logout</a>
 </div>
 
@@ -1330,49 +1336,39 @@ updateClock();
    MOBILE MENU
 ═══════════════════════════════════════════ */
 
-function toggleMobileNav(){
+function toggleMobileNav() {
 
   const menu =
-  document.getElementById(
-  "nav-mobile");
+  document.getElementById("nav-mobile");
 
   const burger =
-  document.getElementById(
-  "nav-burger");
+  document.getElementById("nav-burger");
 
-  menu.classList.toggle(
-  "show");
+  if(menu){
+    menu.classList.toggle("show");
+  }
 
-  burger.classList.toggle(
-  "open");
+  if(burger){
+    burger.classList.toggle("open");
+  }
 }
+document.addEventListener("click", function(e){
 
-document.addEventListener(
-"click",
-function(e){
+  const menu =
+  document.getElementById("nav-mobile");
 
-const menu =
-document.getElementById(
-"nav-mobile");
+  const burger =
+  document.getElementById("nav-burger");
 
-const burger =
-document.getElementById(
-"nav-burger");
-
-if(
-menu &&
-burger &&
-!menu.contains(e.target) &&
-!burger.contains(e.target)
-){
-
-menu.classList.remove(
-"show");
-
-burger.classList.remove(
-"open");
-
-}
+  if(
+    menu &&
+    burger &&
+    !menu.contains(e.target) &&
+    !burger.contains(e.target)
+  ){
+    menu.classList.remove("show");
+    burger.classList.remove("open");
+  }
 
 });
 
@@ -1836,5 +1832,7 @@ setInterval(()=>{
 },1000);
 
 </script>
+
+
 </body>
 </html>
