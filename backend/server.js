@@ -608,6 +608,112 @@ reply:"AI analyse failed"
 
 });
 
+
+app.post("/api/smart-ai", async (req,res)=>{
+
+try{
+
+const { message } = req.body;
+
+const users = await User.find();
+const attendance = await Attendance.find();
+
+const today =
+new Date().toLocaleDateString(
+'en-CA',
+{ timeZone:'Asia/Kolkata' }
+);
+
+const todayAttendance =
+attendance.filter(
+a => a.date === today
+);
+
+const activeUsers =
+attendance.filter(
+a => a.active
+).length;
+
+const modelData = {
+totalUsers: users.length,
+todayAttendance: todayAttendance.length,
+totalRecords: attendance.length,
+activeUsers
+};
+
+const response =
+await axios.post(
+"https://openrouter.ai/api/v1/chat/completions",
+{
+model:"openai/gpt-3.5-turbo",
+
+messages:[
+
+{
+role:"system",
+content:`
+
+You are SANZ Smart AI Assistant 🤖
+
+You belong to SANZ SecureFace AI.
+
+Live website data:
+${JSON.stringify(modelData)}
+
+Rules:
+
+✅ Friendly and smart
+✅ Coding help
+✅ General questions
+✅ Explain AI
+✅ Explain coding
+✅ Explain attendance system
+✅ Use live data when needed
+✅ Never create fake attendance numbers
+✅ Stylish answers
+✅ Easy English
+✅ Helpful and professional
+
+`
+},
+
+{
+role:"user",
+content:message
+}
+
+]
+},
+{
+headers:{
+Authorization:
+`Bearer ${process.env.OPENROUTER_API_KEY}`,
+"Content-Type":"application/json"
+}
+}
+);
+
+const reply =
+response.data
+.choices[0]
+.message
+.content;
+
+res.json({ reply });
+
+}catch(err){
+
+console.log(err);
+
+res.status(500).json({
+reply:"SANZ AI unavailable"
+});
+
+}
+
+});
+
+
 app.listen(PORT, () => {
   console.log(`🚀 Sanz SecureFace AI running at http://localhost:${PORT}`);
 });

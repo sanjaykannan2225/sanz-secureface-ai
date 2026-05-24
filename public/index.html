@@ -436,12 +436,39 @@ justify-content:space-between;
 padding:14px 28px;
 gap:18px;
 flex-wrap:nowrap;
-overflow:hidden;
+overflow:visible;
 }
 /* ───────────────── MOBILE RESPONSIVE ───────────────── */
 
 @media(max-width:900px){
 
+.nav-links{
+position:fixed;
+top:72px;
+left:0;
+width:100%;
+background:#020617;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:20px;
+overflow:hidden;
+max-height:0;
+opacity:0;
+pointer-events:none;
+transform:translateY(-10px);
+transition:all .35s ease;
+z-index:99999;
+}
+
+.nav-links.open{
+display:flex !important;
+max-height:600px;
+padding:25px 0;
+opacity:1;
+pointer-events:auto;
+transform:translateY(0);
+}
 
 .ai-popup{
 width:92%;
@@ -585,26 +612,17 @@ top:72px;
 left:0;
 width:100%;
 background:#020617;
+display:flex;
 flex-direction:column;
 align-items:center;
-padding:0;
 gap:20px;
-transition:0.35s ease;
-border-top:1px solid rgba(0,212,255,0.1);
-z-index:9999;
 overflow:hidden;
+max-height:0;
 opacity:0;
 pointer-events:none;
 transform:translateY(-10px);
-max-height:0;
-}
-
-.nav-links.open{
-max-height:600px;
-padding:25px 0;
-opacity:1;
-pointer-events:auto;
-transform:translateY(0);
+transition:all .35s ease;
+z-index:99999;
 }
 
 .nav-links a{
@@ -1199,6 +1217,7 @@ SANZ <span>SECUREFACE</span> AI
 <li><a href="dashboard.html">Dashboard</a></li>
 <li><a href="activity.html">ACTIVITY</a></li>
 <li><a href="ai-insights.html">AI Insights</a></li>
+<li><a href="ai-assistant.html">AI ASSISTANT</a></li>
 <li><a href="about.html">ABOUT</a></li>
 <li><a href="features.html">FEATURES</a></li>
 <li><a href="user-guide.html">USER GUIDE</a></li>
@@ -1459,15 +1478,10 @@ onclick="speak('Opening dashboard')">
     setInterval(updateClock, 1000);
     updateClock();
 
-function toggleNav() {
-
-const nav =
-document.getElementById("navLinks");
-
-console.log(nav);
-
+function toggleNav(){
+const nav = document.getElementById("navLinks");
 nav.classList.toggle("open");
-
+console.log(nav.className);
 }
     // Fetch stats
     async function loadStats() {

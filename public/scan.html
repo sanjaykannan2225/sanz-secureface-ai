@@ -345,6 +345,54 @@ color:white;
 color:#00d4ff;
 }
 
+/* NAVBAR FIX */
+
+.navbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:14px 28px;
+gap:18px;
+flex-wrap:nowrap;
+overflow-x:auto;
+scrollbar-width:none;
+}
+
+.navbar::-webkit-scrollbar{
+display:none;
+}
+
+.nav-links{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:1.2rem;
+flex:1;
+list-style:none;
+padding:0;
+margin:0;
+flex-wrap:nowrap;
+white-space:nowrap;
+}
+
+.nav-links a{
+white-space:nowrap;
+font-size:.82rem;
+padding:.55rem .75rem;
+}
+
+.nav-clock{
+color:#00e5ff;
+font-size:14px;
+font-family:monospace;
+font-weight:600;
+min-width:95px;
+text-align:right;
+flex-shrink:0;
+margin-left:15px;
+white-space:nowrap;
+}
+
 /* MOBILE */
 
 @media(max-width:768px){
@@ -426,6 +474,62 @@ cursor:pointer;
 from{opacity:0;}
 to{opacity:1;}
 }
+
+/* MOBILE NAV FIX */
+
+.nav-burger{
+display:none;
+background:none;
+border:none;
+cursor:pointer;
+flex-direction:column;
+gap:5px;
+padding:8px;
+}
+
+.nav-burger span{
+width:26px;
+height:3px;
+background:#00d4ff;
+border-radius:3px;
+display:block;
+}
+
+@media (max-width:900px){
+
+.nav-burger{
+display:flex;
+}
+
+.nav-links{
+position:fixed;
+top:72px;
+left:0;
+width:100%;
+background:#020617;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:18px;
+padding:0;
+overflow:hidden;
+max-height:0;
+opacity:0;
+pointer-events:none;
+transform:translateY(-10px);
+transition:all .35s ease;
+z-index:9999;
+border-bottom:1px solid rgba(0,212,255,.15);
+}
+
+.nav-links.open{
+max-height:650px;
+padding:25px 0;
+opacity:1;
+pointer-events:auto;
+transform:translateY(0);
+}
+}
   </style>
 </head>
 
@@ -464,6 +568,7 @@ SANZ <span>SECUREFACE</span> AI
       <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="activity.html">ACTIVITY</a></li>
       <li><a href="ai-insights.html">AI Insights</a></li>
+      <li><a href="ai-assistant.html">AI ASSISTANT</a></li>
             <li><a href="about.html">ABOUT</a></li>
 <li><a href="features.html">FEATURES</a></li>
 <li><a href="user-guide.html">USER GUIDE</a></li>
